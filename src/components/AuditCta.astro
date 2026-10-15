@@ -1,0 +1,38 @@
+---
+import Icon from './Icon.astro';
+import { auditUrl } from '@/site.config';
+import { href } from '@/lib/url';
+
+interface Props {
+  title?: string;
+  text?: string;
+  campaign?: string;
+  content?: string;
+}
+
+const {
+  title = 'Want a second pair of eyes on your schemes?',
+  text = 'SEA Audit reviews support files, Housing Benefit evidence, safeguarding and property standards against the incoming national standards, then gives you a plain-English action plan.',
+  campaign = 'guide-cta',
+  content = 'default',
+} = Astro.props;
+---
+
+<section class="dark-band not-prose relative overflow-hidden rounded-[28px] p-7 md:p-10">
+  <svg class="pointer-events-none absolute -right-10 -top-10 h-56 w-56 opacity-40" viewBox="0 0 200 200" aria-hidden="true">
+    <circle cx="100" cy="100" r="60" fill="none" stroke="#3FD1AD" stroke-width="1.5" class="path-flow"></circle>
+    <circle cx="100" cy="100" r="85" fill="none" stroke="#D8F59A" stroke-width="1" stroke-dasharray="2 8"></circle>
+    <circle cx="100" cy="40" r="5" fill="#D8F59A"></circle>
+  </svg>
+  <p class="eyebrow">SEA Audit</p>
+  <h2 class="mt-3 max-w-2xl font-display text-[1.7rem] font-semibold leading-tight md:text-[2.1rem]">{title}</h2>
+  <p class="mt-3 max-w-2xl text-[1.02rem] text-[#b9cdc8]">{text}</p>
+  <div class="mt-6 flex flex-wrap gap-3">
+    <a href={href('/tools/audit-readiness/')} class="btn btn-lime">
+      Free readiness check <Icon name="arrow-right" size={16} class="arrow" />
+    </a>
+    <a href={auditUrl(campaign, content)} class="btn btn-ghost !text-[#eaf3ef] !shadow-[inset_0_0_0_1.5px_rgba(234,243,239,0.35)]">
+      Book an audit <Icon name="arrow-up-right" size={16} />
+    </a>
+  </div>
+</section>

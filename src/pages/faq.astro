@@ -1,0 +1,82 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import { faqGroups } from '@/data/faqs';
+import { href } from '@/lib/url';
+import { faqPage } from '@/lib/schema';
+
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const all = faqGroups.flatMap((g) => g.items);
+---
+
+<Base
+  title="Supported housing FAQ"
+  description="Straight answers on supported exempt accommodation: licensing, Housing Benefit, service charges, HMOs and running a supported housing service."
+  jsonLd={[faqPage(all, `${origin}${href('/faq/')}`)]}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'FAQ', url: '/faq/' },
+  ]}
+>
+  <PageHero
+    eyebrow="Frequently asked questions"
+    title="Straight answers on supported housing"
+    lede="Short answers first. Where there is more to say, the link takes you to the guide with the detail and the sources."
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'FAQ', url: '/faq/' },
+    ]}
+  />
+
+  <div class="container grid gap-12 lg:grid-cols-[220px_minmax(0,1fr)]">
+    <nav class="hidden lg:block" aria-label="FAQ sections">
+      <div class="sticky top-24 space-y-1">
+        {
+          faqGroups.map((g) => (
+            <a href={`#${g.slug}`} class="block rounded-lg px-3 py-2 text-[15px] text-muted no-underline hover:bg-paper-2 hover:text-ink">
+              {g.title}
+            </a>
+          ))
+        }
+      </div>
+    </nav>
+    <div class="space-y-16">
+      {
+        faqGroups.map((g, gi) => (
+          <>
+            <section id={g.slug} class="scroll-mt-28" aria-labelledby={`h-${g.slug}`}>
+              <h2 id={`h-${g.slug}`} class="text-[1.9rem]">
+                {g.title}
+              </h2>
+              <div class="faq mt-4">
+                {g.items.map((item) => (
+                  <details>
+                    <summary>
+                      <span>{item.q}</span>
+                      <span class="plus" aria-hidden="true">
+                        <Icon name="plus" size={16} />
+                      </span>
+                    </summary>
+                    <div class="answer">
+                      <p>{item.a}</p>
+                      {item.href && (
+                        <a href={href(item.href)} class="mt-3 inline-flex items-center gap-1.5 font-semibold text-teal no-underline">
+                          Read more <Icon name="arrow-right" size={15} />
+                        </a>
+                      )}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </section>
+            {gi === 1 && <AdSlot name="leaderboard" />}
+          </>
+        ))
+      }
+      <AuditCta campaign="faq" />
+    </div>
+  </div>
+</Base>

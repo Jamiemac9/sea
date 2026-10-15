@@ -1,0 +1,97 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import { timeline } from '@/data/timeline';
+import { href } from '@/lib/url';
+
+const ld = {
+  '@type': 'ItemList',
+  name: 'Supported exempt accommodation regulation timeline',
+  itemListOrder: 'https://schema.org/ItemListOrderAscending',
+  itemListElement: timeline.map((m, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: `${m.date}: ${m.title}`,
+    description: m.text,
+  })),
+};
+const lastChecked = '15 October 2026';
+---
+
+<Base
+  title="Supported housing regulation tracker"
+  description="Every key date for supported exempt accommodation in England, from 1996 to licensing in 2027, with what is done, what is in progress and what is expected next."
+  jsonLd={[ld]}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Regulation tracker', url: '/regulation-tracker/' },
+  ]}
+>
+  <PageHero
+    eyebrow={`Last checked ${lastChecked}`}
+    title="Regulation tracker"
+    lede="The dates that shaped supported exempt accommodation, and the ones still to come. We update this page when the government publishes something new."
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'Regulation tracker', url: '/regulation-tracker/' },
+    ]}
+  >
+    <div class="reveal mt-8 flex flex-wrap gap-3 text-[14px]" style="--i:3">
+      <span class="chip chip-ink">Done</span>
+      <span class="chip">In progress</span>
+      <span class="chip chip-sun">Expected</span>
+    </div>
+  </PageHero>
+
+  <div class="container grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div class="timeline" data-timeline>
+      <span class="timeline-progress" aria-hidden="true"></span>
+      <ol>
+      {
+        timeline.map((m) => (
+          <li class="timeline-item" data-status={m.status}>
+            <span class="timeline-dot" aria-hidden="true" />
+            <div class="flex flex-wrap items-center gap-2">
+              <time class="font-display text-[1.05rem] font-semibold text-teal">{m.date}</time>
+              <span class="chip chip-ink !py-0.5 !text-[12px]">{m.tag}</span>
+              {m.status !== 'done' && (
+                <span class:list={['chip !py-0.5 !text-[12px]', m.status === 'upcoming' && 'chip-sun']}>
+                  {m.status === 'upcoming' ? 'Expected' : 'In progress'}
+                </span>
+              )}
+            </div>
+            <h2 class="mt-2 text-[1.35rem] leading-snug">{m.title}</h2>
+            <p class="mt-2 max-w-2xl text-[15.5px] leading-relaxed text-ink-2">{m.text}</p>
+            {m.link && (
+              <a href={href(m.link.href)} class="mt-3 inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-teal no-underline">
+                {m.link.label} <Icon name="arrow-right" size={15} />
+              </a>
+            )}
+          </li>
+        ))
+      }
+      </ol>
+    </div>
+    <aside>
+      <div class="sticky top-24 space-y-6">
+        <div class="card p-6">
+          <p class="eyebrow">What to do now</p>
+          <ol class="mt-4 space-y-3 text-[15px] text-ink-2">
+            <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-[12px] font-bold text-paper">1</span>List every scheme and check for exemptions</li>
+            <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-[12px] font-bold text-paper">2</span>Check needs assessments are done within four weeks</li>
+            <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-[12px] font-bold text-paper">3</span>Prepare fit and proper evidence for your board</li>
+          </ol>
+          <a href={href('/tools/audit-readiness/')} class="btn btn-primary btn-sm mt-6 w-full">Take the readiness check <Icon name="arrow-right" size={15} class="arrow" /></a>
+        </div>
+        <AdSlot name="sidebar" />
+      </div>
+    </aside>
+  </div>
+
+  <div class="container mt-16">
+    <AuditCta campaign="tracker" title="Be ready before your council's licensing scheme opens" />
+  </div>
+</Base>

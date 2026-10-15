@@ -1,0 +1,28 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+---
+
+<Base
+  noindex
+  title="Cookie policy"
+  description="The cookies and browser storage SEA Hub uses, which are essential, which need your consent, and how to change your choice at any time."
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Cookies', url: '/cookies/' },
+  ]}
+>
+  <PageHero eyebrow="Cookies" title="Cookie policy" lede="Essential storage only, unless you say otherwise." />
+  <div class="container">
+    <div class="prose">
+      <h2>Essential</h2>
+      <p>We store your theme choice and your cookie choice in your browser. These are needed for the site to remember what you asked for and do not track you.</p>
+      <h2>Analytics (optional)</h2>
+      <p>If you accept analytics, Google Analytics sets cookies to count visits and see which pages are used. IP addresses are anonymised.</p>
+      <h2>Advertising (optional)</h2>
+      <p>If you accept advertising, Google AdSense may set cookies to show and measure adverts. If you decline, we show our own promotions instead, which set no cookies.</p>
+      <h2>Changing your choice</h2>
+      <p>Use <button type="button" class="font-semibold text-teal underline underline-offset-2" data-consent-open>cookie settings</button> at any time, or clear this site's storage in your browser.</p>
+    </div>
+  </div>
+</Base>

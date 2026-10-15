@@ -1,0 +1,49 @@
+---
+import { href } from '@/lib/url';
+import { ads } from '@/site.config';
+---
+
+{
+  ads.consent === 'builtin' && (
+    <div class="consent no-print" data-consent role="dialog" aria-modal="false" aria-labelledby="consent-title" hidden>
+      <div class="card p-5 md:p-6">
+        <p id="consent-title" class="font-display text-lg font-semibold">
+          Cookies on SEA Hub
+        </p>
+        <p class="mt-2 text-[14.5px] text-ink-2">
+          We use essential storage to remember your settings. With your permission we also use cookies for anonymous
+          analytics and to show adverts that keep the guides free. You can change this at any time from the footer.{' '}
+          <a href={href('/cookies/')} class="text-teal underline underline-offset-2">
+            Cookie policy
+          </a>
+        </p>
+        <fieldset class="mt-4 space-y-2 text-[14.5px]" data-consent-details hidden>
+          <legend class="sr-only">Choose cookies</legend>
+          <label class="flex items-center gap-3">
+            <input type="checkbox" checked disabled class="h-4 w-4 accent-[var(--teal)]" /> Essential (always on)
+          </label>
+          <label class="flex items-center gap-3">
+            <input type="checkbox" data-consent-analytics class="h-4 w-4 accent-[var(--teal)]" /> Analytics
+          </label>
+          <label class="flex items-center gap-3">
+            <input type="checkbox" data-consent-ads class="h-4 w-4 accent-[var(--teal)]" /> Advertising
+          </label>
+        </fieldset>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <button type="button" class="btn btn-primary btn-sm" data-consent-accept>
+            Accept all
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" data-consent-reject>
+            Essential only
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" data-consent-customise>
+            Choose
+          </button>
+          <button type="button" class="btn btn-dark btn-sm" data-consent-save hidden>
+            Save choices
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,26 @@
+---
+import Icon from './Icon.astro';
+import { categories } from '@/content.config';
+import { href } from '@/lib/url';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  guide: CollectionEntry<'guides'>;
+  i?: number;
+  compact?: boolean;
+}
+const { guide, i = 0, compact = false } = Astro.props;
+const d = guide.data;
+---
+
+<a href={href(`/guides/${guide.id}/`)} class="card card-link reveal flex h-full flex-col p-6" style={`--i:${i % 6}`}>
+  <div class="flex items-center justify-between gap-3">
+    <span class="chip">{categories[d.category].label}</span>
+    <Icon name="arrow-up-right" size={18} class="card-arrow text-muted" />
+  </div>
+  <h3 class:list={['mt-5 font-display font-semibold leading-snug', compact ? 'text-[1.15rem]' : 'text-[1.3rem]']}>{d.title}</h3>
+  {!compact && <p class="mt-2 line-clamp-3 text-[15px] leading-relaxed text-muted">{d.description}</p>}
+  <p class="mt-auto pt-5 text-[13px] text-muted">
+    Updated {d.updated.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+  </p>
+</a>

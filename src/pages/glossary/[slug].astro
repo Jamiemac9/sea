@@ -1,0 +1,141 @@
+---
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Icon from '@/components/Icon.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import { glossary, glossaryBySlug, type Term } from '@/data/glossary';
+import { href } from '@/lib/url';
+import { sortedGuides } from '@/lib/content';
+
+export function getStaticPaths() {
+  return glossary.map((term) => ({ params: { slug: term.slug }, props: { term } }));
+}
+
+interface Props {
+  term: Term;
+}
+const { term } = Astro.props;
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const url = `${origin}${href(`/glossary/${term.slug}/`)}`;
+const related = (term.related || []).map((s) => glossaryBySlug[s]).filter(Boolean) as Term[];
+// Guides that mention the term, so each definition links into the detail.
+const needles = [term.term.replace(/ \(.*\)$/, ''), ...(term.aka || [])].map((n) => n.toLowerCase()).filter((n) => n.length > 3);
+const mentions = (await sortedGuides())
+  .filter((g) => href(`/guides/${g.id}/`) !== href(term.guide?.href || '#'))
+  .map((g) => ({ g, hits: needles.reduce((n, k) => n + ((g.body || '').toLowerCase().split(k).length - 1), 0) }))
+  .filter((x) => x.hits > 0)
+  .sort((a, b) => b.hits - a.hits)
+  .slice(0, 3)
+  .map((x) => x.g);
+
+const ld = [
+  {
+    '@type': 'DefinedTerm',
+    '@id': `${url}#term`,
+    name: term.term,
+    alternateName: term.aka,
+    description: term.short,
+    url,
+    inDefinedTermSet: `${origin}/glossary/#set`,
+  },
+  {
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `What does ${term.term.replace(/ \(.*\)$/, '')} mean?`,
+        acceptedAnswer: { '@type': 'Answer', text: [term.short, ...term.body].join(' ') },
+      },
+    ],
+  },
+];
+const plain = term.term.replace(/ \(.*\)$/, '');
+const longTitle = `${plain}: definition | SEA Hub`;
+const pageTitle = longTitle.length <= 60 ? longTitle : `${plain} | SEA Hub`;
+---
+
+<Base
+  title={`${plain}: definition`}
+  fullTitle={pageTitle}
+  description={term.short.length > 155 ? term.short.slice(0, 152).replace(/\s+\S*$/, '') + '...' : term.short}
+  jsonLd={ld}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Glossary', url: '/glossary/' },
+    { name: term.term, url: `/glossary/${term.slug}/` },
+  ]}
+>
+  <article class="container max-w-4xl pb-6 pt-8 md:pt-12">
+    <Breadcrumbs
+      items={[
+        { name: 'Home', url: '/' },
+        { name: 'Glossary', url: '/glossary/' },
+        { name: term.term, url: `/glossary/${term.slug}/` },
+      ]}
+    />
+    <p class="eyebrow mt-8">Glossary</p>
+    <h1 class="mt-4 text-[2.4rem] font-[680] leading-[1.05] tracking-[-0.03em] md:text-[3.4rem]">{term.term}</h1>
+    {term.aka && <p class="mt-3 text-[15px] text-muted">Also called: {term.aka.join(', ')}</p>}
+
+    <section class="quick-answer mt-8" aria-label="Definition">
+      <p class="eyebrow">In one sentence</p>
+      <p class="mt-3 font-display text-[1.3rem] font-medium leading-snug text-ink md:text-[1.45rem]">{term.short}</p>
+    </section>
+
+    <div class="prose mt-8">
+      {term.body.map((p) => <p>{p}</p>)}
+    </div>
+
+    {
+      term.guide && (
+        <a href={href(term.guide.href)} class="card card-link mt-8 flex items-center justify-between gap-4 p-5">
+          <span>
+            <span class="block text-[12.5px] font-semibold uppercase tracking-[0.08em] text-muted">Read the full guide</span>
+            <span class="mt-1 block font-display text-[1.2rem] font-semibold">{term.guide.label}</span>
+          </span>
+          <Icon name="arrow-right" size={20} class="card-arrow text-teal" />
+        </a>
+      )
+    }
+
+    {
+      related.length > 0 && (
+        <section class="mt-12" aria-labelledby="related-terms">
+          <h2 id="related-terms" class="text-[1.4rem]">
+            Related terms
+          </h2>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            {related.map((r) => (
+              <a href={href(`/glossary/${r.slug}/`)} class="card card-link block p-4">
+                <span class="block font-display font-semibold">{r.term}</span>
+                <span class="mt-1 block text-[14px] leading-relaxed text-muted">{r.short}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      mentions.length > 0 && (
+        <section class="mt-12" aria-labelledby="where-it-comes-up">
+          <h2 id="where-it-comes-up" class="text-[1.4rem]">
+            Where it comes up
+          </h2>
+          <ul class="mt-4 space-y-3">
+            {mentions.map((g) => (
+              <li>
+                <a href={href(`/guides/${g.id}/`)} class="group block no-underline">
+                  <span class="font-semibold text-teal group-hover:underline">{g.data.title}</span>
+                  <span class="mt-1 block text-[14.5px] leading-relaxed text-muted">{g.data.quickAnswer}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <AdSlot name="inArticle" class="mt-12" />
+  </article>
+</Base>

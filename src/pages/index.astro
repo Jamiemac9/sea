@@ -1,0 +1,374 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Icon, { type IconName } from '@/components/Icon.astro';
+import HeroVisual from '@/components/HeroVisual.astro';
+import GuideCard from '@/components/GuideCard.astro';
+import Faq from '@/components/Faq.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import { audienceList } from '@/data/audiences';
+import { timeline } from '@/data/timeline';
+import { categories } from '@/content.config';
+import { site } from '@/site.config';
+import { href } from '@/lib/url';
+import { faqPage } from '@/lib/schema';
+
+const guides = (await getCollection('guides')).sort((a, b) => a.data.order - b.data.order);
+const featured = guides.filter((g) => g.data.featured).slice(0, 6);
+
+const topics: { key: keyof typeof categories; icon: IconName; href: string; span?: string }[] = [
+  { key: 'foundations', icon: 'book', href: '/guides/#foundations', span: 'md:col-span-2' },
+  { key: 'grey', icon: 'help', href: '/guides/grey-areas-in-exempt-accommodation/' },
+  { key: 'types', icon: 'layers', href: '/guides/#types' },
+  { key: 'money', icon: 'pound', href: '/guides/#money' },
+  { key: 'regulation', icon: 'gavel', href: '/guides/#regulation' },
+  { key: 'practice', icon: 'clipboard', href: '/guides/#practice', span: 'md:col-span-2' },
+];
+const countIn = (k: string) => guides.filter((g) => g.data.category === k).length;
+const shortLabel = (t: string) => {
+  const s = t.split(',')[0].replace(/^(The|A) /, '').replace(/\?$/, '');
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+const marquee = [
+  'Exempt accommodation',
+  'Specified accommodation',
+  'Supported living',
+  'Transitional housing',
+  'Emergency accommodation',
+  'Care leavers',
+  'Refuges',
+  'Housing First',
+  'Intensive housing management',
+  'Licensing 2027',
+  'National standards',
+  "Renters' Rights Act",
+  'CAS-3',
+  'HMO licensing',
+  "Awaab's Law",
+];
+
+const quick = [
+  {
+    q: 'What is exempt accommodation?',
+    a: 'Supported housing where a housing association, registered charity, voluntary organisation or county council is the landlord and it, or someone acting for it, provides more than minimal care, support or supervision. Housing Benefit pays the rent without the usual local caps.',
+  },
+  {
+    q: 'When does supported housing licensing start?',
+    a: 'Licensing under the Supported Housing (Regulatory Oversight) Act 2023 is expected to start in 2027. Draft regulations were due to be consulted on later in 2026.',
+  },
+  {
+    q: 'Does Housing Benefit pay for support?',
+    a: 'No. Housing Benefit covers core rent and eligible service charges, including intensive housing management. Support, counselling and personal care are paid for separately.',
+  },
+  {
+    q: 'How soon must a resident have a needs assessment?',
+    a: 'Under the licensing conditions in the April 2026 government response, on moving in or within four weeks.',
+  },
+  {
+    q: 'Do supported shared houses need an HMO licence?',
+    a: 'Usually, where five or more people from two or more households share facilities, unless a registered provider or other exempt public body manages the building. Charities and CICs are not exempt.',
+  },
+];
+
+const recent = timeline.slice(-5);
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+---
+
+<Base
+  title={site.name}
+  fullTitle="SEA Hub: supported exempt accommodation guides and tools"
+  description="Plain-English guides, a regulation tracker and free tools for supported exempt accommodation, supported living, transitional and emergency housing in England."
+  jsonLd={[faqPage(quick, `${origin}/`)]}
+  showFooterAd={false}
+>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div class="blob blob-c"></div>
+    <div class="container grid items-center gap-12 pb-16 pt-10 md:pt-16 lg:grid-cols-[1.08fr_1fr] lg:pb-24">
+      <div>
+        <p class="eyebrow reveal">Supported housing resource hub for England</p>
+        <h1 class="display reveal mt-5" style="--i:1">
+          Supported housing rules, <span class="highlight">without the jargon.</span>
+        </h1>
+        <p class="lede reveal mt-6 max-w-xl" style="--i:2">
+          Guides, a regulation tracker and free tools on exempt, supported, transitional and emergency accommodation. For
+          support providers, housing providers, managing agents and proptech teams.
+        </p>
+        <button
+          type="button"
+          data-search-open
+          class="reveal group mt-8 flex w-full max-w-xl items-center gap-3 rounded-2xl border border-line bg-card px-4 py-3.5 text-left shadow-[var(--shadow)] transition hover:border-ink-2"
+          style="--i:3"
+        >
+          <Icon name="search" size={18} class="text-teal" />
+          <span class="flex-1 text-[15.5px] text-muted">Try "more than minimal support" or "licensing"</span>
+          <kbd class="hidden sm:inline">Ctrl K</kbd>
+        </button>
+        <div class="reveal mt-6 flex flex-wrap gap-3" style="--i:4">
+          <a href={href('/guides/what-is-exempt-accommodation/')} class="btn btn-dark">
+            Start with the basics <Icon name="arrow-right" size={16} class="arrow" />
+          </a>
+          <a href={href('/tools/audit-readiness/')} class="btn btn-ghost">
+            Free readiness check <Icon name="clipboard" size={16} />
+          </a>
+        </div>
+        <p class="reveal mt-6 flex items-center gap-2 text-[13.5px] text-muted" style="--i:5">
+          <Icon name="check" size={15} class="text-teal" /> Every guide cites legislation or official guidance, and says when it was last checked.
+        </p>
+      </div>
+      <div class="reveal" style="--i:2">
+        <HeroVisual />
+      </div>
+    </div>
+
+    <div class="marquee border-y border-line bg-card/60 py-4" aria-hidden="true">
+      {
+        [0, 1].map(() => (
+          <div class="marquee-track">
+            {marquee.map((m) => (
+              <span class="chip chip-ink !bg-transparent text-[14px]">
+                <Icon name="spark" size={12} class="text-teal" />
+                {m}
+              </span>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Audiences -->
+  <section class="container py-20 md:py-28" aria-labelledby="audiences">
+    <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+      <div>
+        <p class="eyebrow reveal">Start where you are</p>
+        <h2 id="audiences" class="h-section reveal mt-4" style="--i:1">One hub, four ways in.</h2>
+      </div>
+      <p class="lede reveal" style="--i:2">
+        The same scheme looks different to the people running support, the landlord, the agent managing the building and
+        the team building its software. Pick your role for the guides that matter most to you.
+      </p>
+    </div>
+
+    <div class="reveal mt-10" data-tabs style="--i:3">
+      <div class="relative inline-flex max-w-full overflow-x-auto rounded-full border border-line bg-card p-1" role="tablist" aria-label="Choose your role">
+        <span class="tab-indicator" aria-hidden="true"></span>
+        {
+          audienceList.map((a, i) => (
+            <button
+              type="button"
+              role="tab"
+              class="tab relative z-[1]"
+              id={`tab-${a.slug}`}
+              aria-controls={`panel-${a.slug}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+            >
+              {a.label}
+            </button>
+          ))
+        }
+      </div>
+      {
+        audienceList.map((a, i) => (
+          <div id={`panel-${a.slug}`} role="tabpanel" aria-labelledby={`tab-${a.slug}`} hidden={i !== 0} class="mt-8">
+            <div class="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
+              <div class="card relative overflow-hidden p-7 md:p-8">
+                <span class="icon-tile">
+                  <Icon name={a.icon} size={22} />
+                </span>
+                <h3 class="mt-5 text-[1.6rem] leading-tight">{a.headline}</h3>
+                <p class="mt-3 text-[15.5px] text-muted">{a.intro}</p>
+                <a href={href(`/for/${a.slug}/`)} class="btn btn-dark btn-sm mt-6">
+                  Hub for {a.label.toLowerCase()} <Icon name="arrow-right" size={15} class="arrow" />
+                </a>
+              </div>
+              <div class="grid gap-4 sm:grid-cols-2">
+                {a.start.map((s) => (
+                  <a href={href(s.href)} class="card card-link flex flex-col p-5">
+                    <span class="flex items-start justify-between gap-3">
+                      <span class="font-display text-[1.08rem] font-semibold leading-snug">{s.label}</span>
+                      <Icon name="arrow-up-right" size={17} class="card-arrow mt-1 shrink-0 text-muted" />
+                    </span>
+                    <span class="mt-2 text-[14px] text-muted">{s.why}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Topics -->
+  <section class="bg-paper-2/70 py-20 md:py-28" aria-labelledby="topics">
+    <div class="container">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="eyebrow reveal">Browse by topic</p>
+          <h2 id="topics" class="h-section reveal mt-4" style="--i:1">Everything from definitions to the grey areas.</h2>
+        </div>
+        <a href={href('/guides/')} class="btn btn-ghost reveal">All {guides.length} guides <Icon name="arrow-right" size={16} class="arrow" /></a>
+      </div>
+      <div class="mt-10 grid gap-5 md:grid-cols-4">
+        {
+          topics.map((t, i) => (
+            <a href={href(t.href)} class:list={['card card-link reveal flex min-h-[210px] flex-col p-6 md:p-7', t.span]} style={`--i:${i}`}>
+              <span class="flex items-start justify-between">
+                <span class="icon-tile">
+                  <Icon name={t.icon} size={22} />
+                </span>
+                <span class="chip chip-ink">{countIn(t.key)} {countIn(t.key) === 1 ? 'guide' : 'guides'}</span>
+              </span>
+              <span class="mt-auto pt-8">
+                <span class="block font-display text-[1.45rem] font-semibold leading-tight">{categories[t.key].label}</span>
+                <span class="mt-1.5 block text-[14.5px] leading-relaxed text-muted">{categories[t.key].blurb}</span>
+                <span class="mt-4 flex flex-wrap gap-1.5">
+                  {guides
+                    .filter((g) => g.data.category === t.key)
+                    .slice(0, t.span ? 4 : 2)
+                    .map((g) => (
+                      <span class="rounded-full bg-paper-2 px-2.5 py-1 text-[12.5px] font-medium text-ink-2">{shortLabel(g.data.title)}</span>
+                    ))}
+                </span>
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Numbers -->
+  <section class="dark-band relative overflow-hidden py-20 md:py-24" aria-labelledby="numbers">
+    <div class="container">
+      <p class="eyebrow reveal">The sector in numbers</p>
+      <h2 id="numbers" class="h-section reveal mt-4 max-w-3xl" style="--i:1">Big, fast-growing and only now getting a regulator.</h2>
+      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="reveal border-t border-white/15 pt-6" style="--i:0">
+          <p class="stat-num text-lime"><span data-count="634000">634,000</span></p>
+          <p class="mt-3 text-[15px] text-[#b9cdc8]">units of supported housing across Great Britain</p>
+          <p class="mt-2 text-[12.5px] text-[#86a19b]">Supported Housing Review 2023, published Nov 2024</p>
+        </div>
+        <div class="reveal border-t border-white/15 pt-6" style="--i:1">
+          <p class="stat-num"><span data-count="215770">215,770</span></p>
+          <p class="mt-3 text-[15px] text-[#b9cdc8]">specified accommodation claims on the Housing Benefit system</p>
+          <p class="mt-2 text-[12.5px] text-[#86a19b]">Supported Housing Review 2023</p>
+        </div>
+        <div class="reveal border-t border-white/15 pt-6" style="--i:2">
+          <p class="stat-num"><span data-count="25000">25,000</span></p>
+          <p class="mt-3 text-[15px] text-[#b9cdc8]">people living in exempt accommodation in Birmingham</p>
+          <p class="mt-2 text-[12.5px] text-[#86a19b]">Birmingham council motion, January 2025</p>
+        </div>
+        <div class="reveal border-t border-white/15 pt-6" style="--i:3">
+          <p class="stat-num">£<span data-count="107">107</span>m</p>
+          <p class="mt-3 text-[15px] text-[#b9cdc8]">spent by London boroughs on exempt accommodation in one year</p>
+          <p class="mt-2 text-[12.5px] text-[#86a19b]">London Assembly Housing Committee, March 2023</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick answers -->
+  <section class="container py-20 md:py-28" aria-labelledby="quick-answers">
+    <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+      <div>
+        <p class="eyebrow reveal">Quick answers</p>
+        <h2 id="quick-answers" class="h-section reveal mt-4" style="--i:1">The questions we get asked most.</h2>
+        <p class="lede reveal mt-5" style="--i:2">Short, direct answers first. Each links through to the full guide with sources.</p>
+        <a href={href('/faq/')} class="btn btn-ghost reveal mt-7" style="--i:3">More questions <Icon name="arrow-right" size={16} class="arrow" /></a>
+      </div>
+      <div class="reveal" style="--i:2">
+        <Faq items={quick} open={0} />
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <AdSlot name="leaderboard" />
+  </div>
+
+  <!-- Timeline -->
+  <section class="container py-20 md:py-28" aria-labelledby="tracker">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <p class="eyebrow reveal">Regulation tracker</p>
+        <h2 id="tracker" class="h-section reveal mt-4" style="--i:1">What has changed, and what is next.</h2>
+      </div>
+      <a href={href('/regulation-tracker/')} class="btn btn-ghost reveal">Full timeline <Icon name="arrow-right" size={16} class="arrow" /></a>
+    </div>
+    <ol class="mt-10 grid gap-4 md:grid-cols-5">
+      {
+        recent.map((m, i) => (
+          <li class="card reveal relative flex flex-col p-5" style={`--i:${i}`}>
+            <span class:list={['chip w-fit', m.status === 'upcoming' ? 'chip-sun' : m.status === 'current' ? '' : 'chip-ink']}>
+              {m.status === 'upcoming' ? 'Expected' : m.status === 'current' ? 'In progress' : 'Done'}
+            </span>
+            <time class="mt-4 font-display text-[1.05rem] font-semibold text-teal">{m.date}</time>
+            <p class="mt-1 font-display text-[1.08rem] font-semibold leading-snug">{m.title}</p>
+            <p class="mt-2 text-[14px] leading-relaxed text-muted">{m.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <!-- Tools -->
+  <section class="bg-paper-2/70 py-20 md:py-28" aria-labelledby="tools">
+    <div class="container">
+      <p class="eyebrow reveal">Free tools</p>
+      <h2 id="tools" class="h-section reveal mt-4 max-w-3xl" style="--i:1">Check your position in minutes, not meetings.</h2>
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        <a href={href('/tools/audit-readiness/')} class="card card-link reveal flex flex-col p-7" style="--i:0">
+          <span class="icon-tile"><Icon name="clipboard" size={22} /></span>
+          <span class="mt-6 font-display text-[1.4rem] font-semibold">Audit readiness check</span>
+          <span class="mt-2 text-[15px] text-muted">24 questions across eight areas, scored against what licensing and councils look for. About 10 minutes.</span>
+          <span class="mt-6 inline-flex items-center gap-2 font-semibold text-teal">Start the check <Icon name="arrow-right" size={16} class="card-arrow" /></span>
+        </a>
+        <a href={href('/tools/exempt-accommodation-checker/')} class="card card-link reveal flex flex-col p-7" style="--i:1">
+          <span class="icon-tile"><Icon name="compass" size={22} /></span>
+          <span class="mt-6 font-display text-[1.4rem] font-semibold">Exempt accommodation checker</span>
+          <span class="mt-2 text-[15px] text-muted">Answer six questions to see which specified accommodation category a scheme is likely to fall into, and why.</span>
+          <span class="mt-6 inline-flex items-center gap-2 font-semibold text-teal">Check a scheme <Icon name="arrow-right" size={16} class="card-arrow" /></span>
+        </a>
+        <a href={href('/tools/service-charge-calculator/')} class="card card-link reveal flex flex-col p-7" style="--i:2">
+          <span class="icon-tile"><Icon name="pound" size={22} /></span>
+          <span class="mt-6 font-display text-[1.4rem] font-semibold">Service charge calculator</span>
+          <span class="mt-2 text-[15px] text-muted">Split a weekly charge into eligible and ineligible lines for Housing Benefit, with notes on each.</span>
+          <span class="mt-6 inline-flex items-center gap-2 font-semibold text-teal">Open the calculator <Icon name="arrow-right" size={16} class="card-arrow" /></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured guides -->
+  <section class="container py-20 md:py-28" aria-labelledby="featured">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <p class="eyebrow reveal">Most read</p>
+        <h2 id="featured" class="h-section reveal mt-4" style="--i:1">Guides to start with.</h2>
+      </div>
+      <a href={href('/guides/')} class="btn btn-ghost reveal">Browse all <Icon name="arrow-right" size={16} class="arrow" /></a>
+    </div>
+    <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {featured.map((g, i) => <GuideCard guide={g} i={i} />)}
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="reveal">
+      <AuditCta
+        title="Licensing will test your evidence. Test it first."
+        text="SEA Audit carries out independent audits of supported exempt accommodation: structure, support files, safeguarding, property compliance and rent evidence. You get a scored report and a plain-English action plan."
+        campaign="home"
+        content="bottom-band"
+      />
+    </div>
+  </section>
+</Base>

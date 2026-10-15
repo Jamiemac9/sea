@@ -1,0 +1,21 @@
+---
+import Base from '@/layouts/Base.astro';
+import Icon from '@/components/Icon.astro';
+import { href } from '@/lib/url';
+---
+
+<Base title="Page not found" description="The page you were looking for has moved or does not exist. Search the hub or start from the guides." noindex showFooterAd={false}>
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="blob blob-a"></div>
+    <div class="container py-24 text-center md:py-32">
+      <p class="eyebrow justify-center">404</p>
+      <h1 class="display mt-5">That page has moved on.</h1>
+      <p class="lede mx-auto mt-6 max-w-xl">It may have been renamed when a guide was updated. Search for it, or start from the guides.</p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <button type="button" class="btn btn-dark" data-search-open>Search the hub <Icon name="search" size={16} /></button>
+        <a href={href('/guides/')} class="btn btn-ghost">All guides <Icon name="arrow-right" size={16} class="arrow" /></a>
+      </div>
+    </div>
+  </section>
+</Base>

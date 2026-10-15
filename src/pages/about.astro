@@ -1,0 +1,109 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import { site, auditUrl } from '@/site.config';
+import { href } from '@/lib/url';
+
+const standards = [
+  {
+    title: 'Answer first',
+    text: 'Every guide opens with a direct answer and a short version of no more than five points. Detail comes after, for readers who need it.',
+  },
+  {
+    title: 'Primary sources',
+    text: 'We cite legislation, official guidance and published reports first. Where we rely on commentary from law firms or charities, the source list says so.',
+  },
+  {
+    title: 'Dated and checked',
+    text: 'Each guide shows when it was last updated. When the government publishes something that changes a guide, we update it and the date.',
+  },
+  {
+    title: 'Plain English',
+    text: 'We write for people doing the work. No filler, no sales language, and terms of art explained the first time they appear.',
+  },
+  {
+    title: 'Honest about grey areas',
+    text: 'Where the rules are unclear, we say so, set out what is settled and what is not, and suggest what to do. We do not present a guess as the law.',
+  },
+  {
+    title: 'Ads stay separate',
+    text: 'Adverts and sponsored placements are labelled. Advertisers have no say over what we write.',
+  },
+];
+---
+
+<Base
+  title="About SEA Hub and our editorial standards"
+  description="Who publishes SEA Hub, how we write and check our guides, how we handle corrections, and how advertising and SEA Audit relate to the content."
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'About', url: '/about/' },
+  ]}
+>
+  <PageHero
+    eyebrow="About"
+    title="A resource hub for people who run supported housing"
+    lede={`${site.name} is published by SEA Audit. It exists because the people who run supported exempt accommodation deserve clear, sourced guidance in one place, and most of what exists is spread across legislation, consultation papers and conference slides.`}
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'About', url: '/about/' },
+    ]}
+  />
+
+  <div class="container">
+    <section aria-labelledby="standards">
+      <h2 id="standards" class="text-[2rem]">Editorial standards</h2>
+      <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {
+          standards.map((s, i) => (
+            <div class="card reveal p-6" style={`--i:${i}`}>
+              <span class="icon-tile">
+                <Icon name="check" size={20} />
+              </span>
+              <h3 class="mt-4 text-[1.2rem]">{s.title}</h3>
+              <p class="mt-2 text-[15px] leading-relaxed text-muted">{s.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="prose mt-20" aria-labelledby="who">
+      <h2 id="who">Who we are</h2>
+      <p>
+        {site.name} is written by the {site.name} editorial team at SEA Audit, which carries out independent
+        audits of supported exempt accommodation. We see the same questions come up across providers, councils and investors, and we
+        publish the answers here so anyone can use them.
+      </p>
+      <p>
+        The guides are general information about the law and practice in England. They are not legal advice. For a decision on a
+        particular claim or scheme, speak to the council, your own adviser or a solicitor.
+      </p>
+
+      <h2>How SEA Audit fits in</h2>
+      <p>
+        Some pages link to SEA Audit's services and to our free readiness check. We keep those links clearly marked. The guides are
+        written to be useful whether or not you ever use SEA Audit.
+      </p>
+
+      <h2>Corrections</h2>
+      <p>
+        If you spot something wrong or out of date, email <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a> with the page
+        and what needs to change. We check every correction against the source and update the page and its date.
+      </p>
+
+      <h2>How we use AI tools</h2>
+      <p>
+        We use software, including AI tools, to help draft, check readability and find sources. Our rule is that a person checks every
+        guide against the sources listed on it before it is published, and every build runs an automated check for vague, inflated or
+        padded writing.
+      </p>
+    </section>
+
+    <div class="mt-12 flex flex-wrap gap-3">
+      <a href={auditUrl('about', 'cta')} class="btn btn-dark">Visit SEA Audit <Icon name="arrow-up-right" size={16} /></a>
+      <a href={href('/advertise/')} class="btn btn-ghost">Advertise on {site.name} <Icon name="arrow-right" size={16} class="arrow" /></a>
+    </div>
+  </div>
+</Base>

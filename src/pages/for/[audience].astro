@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import GuideCard from '@/components/GuideCard.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import { audienceList, type Audience } from '@/data/audiences';
+import { href } from '@/lib/url';
+
+export function getStaticPaths() {
+  return audienceList.map((a) => ({ params: { audience: a.slug }, props: { a } }));
+}
+interface Props {
+  a: Audience;
+}
+const { a } = Astro.props;
+const guides = (await getCollection('guides'))
+  .filter((g) => g.data.audiences.includes(a.slug))
+  .sort((x, y) => x.data.order - y.data.order);
+---
+
+<Base
+  title={a.title}
+  description={a.description}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: a.label, url: `/for/${a.slug}/` },
+  ]}
+>
+  <PageHero
+    eyebrow={`For ${a.label.toLowerCase()}`}
+    title={a.headline}
+    lede={a.intro}
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: a.label, url: `/for/${a.slug}/` },
+    ]}
+  />
+
+  <div class="container grid gap-8 lg:grid-cols-[1fr_1.3fr]">
+    <section class="card reveal p-7 md:p-8" aria-labelledby="priorities">
+      <span class="icon-tile"><Icon name={a.icon} size={22} /></span>
+      <h2 id="priorities" class="mt-5 text-[1.6rem]">Your five priorities</h2>
+      <ol class="mt-5 space-y-3.5">
+        {
+          a.priorities.map((p, i) => (
+            <li class="flex gap-3 text-[15.5px] text-ink-2">
+              <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-[13px] font-bold text-paper">{i + 1}</span>
+              <span class="pt-0.5">{p}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+    <section aria-labelledby="start-here">
+      <h2 id="start-here" class="sr-only">Start here</h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {
+          a.start.map((s, i) => (
+            <a href={href(s.href)} class="card card-link reveal flex flex-col p-6" style={`--i:${i}`}>
+              <span class="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">Start here {i + 1}</span>
+              <span class="mt-2 font-display text-[1.2rem] font-semibold leading-snug">{s.label}</span>
+              <span class="mt-2 text-[14.5px] text-muted">{s.why}</span>
+              <Icon name="arrow-right" size={18} class="card-arrow mt-auto pt-4 text-teal" />
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+
+  <div class="container mt-16">
+    <AdSlot name="leaderboard" />
+  </div>
+
+  <section class="container mt-16" aria-labelledby="all-guides">
+    <h2 id="all-guides" class="text-[2rem]">Every guide for {a.label.toLowerCase()}</h2>
+    <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {guides.map((g, i) => <GuideCard guide={g} i={i} />)}
+    </div>
+  </section>
+
+  <div class="container mt-20">
+    <AuditCta campaign={`audience-${a.slug}`} />
+  </div>
+</Base>

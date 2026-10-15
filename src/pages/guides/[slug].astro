@@ -1,0 +1,258 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Icon from '@/components/Icon.astro';
+import Callout from '@/components/Callout.astro';
+import TableEl from '@/components/TableEl.astro';
+import Faq from '@/components/Faq.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import InArticleAd from '@/components/InArticleAd.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import GuideCard from '@/components/GuideCard.astro';
+import { categories, audiences } from '@/content.config';
+import { href, formatDate, readingMinutes } from '@/lib/url';
+import { article, faqPage, howTo } from '@/lib/schema';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides');
+  return guides.map((guide) => ({ params: { slug: guide.id }, props: { guide, all: guides } }));
+}
+
+interface Props {
+  guide: CollectionEntry<'guides'>;
+  all: CollectionEntry<'guides'>[];
+}
+
+const { guide, all } = Astro.props;
+const d = guide.data;
+const { Content, headings } = await render(guide);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const minutes = readingMinutes(guide.body || '');
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const url = new URL(href(`/guides/${guide.id}/`), origin + '/').toString();
+const cat = categories[d.category];
+
+const relatedFromFm = d.related.map((slug) => all.find((g) => g.id === slug)).filter(Boolean) as CollectionEntry<'guides'>[];
+const related = (
+  relatedFromFm.length
+    ? relatedFromFm
+    : all.filter((g) => g.id !== guide.id && g.data.category === d.category)
+).slice(0, 3);
+
+const ld = [
+  article({
+    url,
+    origin,
+    title: d.title,
+    description: d.description,
+    published: d.published,
+    updated: d.updated,
+    section: cat.label,
+    quickAnswer: d.quickAnswer,
+    keyPoints: d.keyPoints,
+    citations: d.sources,
+    about: [cat.label, ...d.audiences.map((a) => audiences[a])],
+  }),
+  ...(d.faqs.length ? [faqPage(d.faqs, url)] : []),
+  ...(d.howTo ? [howTo({ ...d.howTo, url })] : []),
+];
+
+const components = { Callout, InArticleAd, table: TableEl };
+---
+
+<Base
+  title={d.title}
+  fullTitle={d.seoTitle ? `${d.seoTitle} | SEA Hub` : undefined}
+  description={d.description}
+  ogType="article"
+  jsonLd={ld}
+  published={d.published}
+  updated={d.updated}
+  showFooterAd={false}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Guides', url: '/guides/' },
+    { name: d.title, url: `/guides/${guide.id}/` },
+  ]}
+>
+  <div class="reading-progress" data-reading-progress aria-hidden="true"></div>
+  <article data-article>
+    <header class="hero relative pb-10 pt-8 md:pb-14 md:pt-12">
+      <div class="hero-grid"></div>
+      <div class="blob blob-a !opacity-50"></div>
+      <div class="container">
+        <Breadcrumbs
+          items={[
+            { name: 'Home', url: '/' },
+            { name: 'Guides', url: '/guides/' },
+            { name: cat.label, url: `/guides/#${d.category}` },
+          ]}
+        />
+        <div class="mt-6 flex flex-wrap gap-2">
+          <span class="chip">{cat.label}</span>
+          {d.audiences.map((a) => <span class="chip chip-ink">{audiences[a]}</span>)}
+        </div>
+        <h1 class="mt-5 max-w-4xl text-[2.3rem] font-[680] leading-[1.04] tracking-[-0.03em] md:text-[3.6rem]">{d.title}</h1>
+        <p class="lede mt-5 max-w-3xl">{d.description}</p>
+        <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-muted">
+          <span class="inline-flex items-center gap-1.5"><Icon name="calendar" size={15} /> Updated <time datetime={d.updated.toISOString()}>{formatDate(d.updated)}</time></span>
+          <span class="inline-flex items-center gap-1.5"><Icon name="clock" size={15} /> {minutes} min read</span>
+          <span class="inline-flex items-center gap-1.5"><Icon name="check" size={15} /> Checked against the sources listed below</span>
+          <button type="button" class="inline-flex items-center gap-1.5 hover:text-ink" data-copy={url}>
+            Copy link
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container grid gap-12 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div class="min-w-0">
+        <section class="quick-answer reveal" aria-labelledby="quick-answer">
+          <p id="quick-answer" class="eyebrow">Quick answer</p>
+          <p class="mt-3 font-display text-[1.25rem] font-medium leading-snug text-ink md:text-[1.42rem]">{d.quickAnswer}</p>
+        </section>
+
+        <section class="key-points card reveal mt-6 p-6 md:p-7" aria-labelledby="short-version" style="--i:1">
+          <h2 id="short-version" class="text-[1.15rem] font-semibold">The short version</h2>
+          <ul class="mt-4 space-y-3">
+            {
+              d.keyPoints.map((p) => (
+                <li class="flex gap-3 text-[15.5px] leading-relaxed text-ink-2">
+                  <span class="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-lime text-[#0b1f24]">
+                    <Icon name="check" size={12} stroke={3} />
+                  </span>
+                  <span>{p}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        {
+          toc.length > 2 && (
+            <details class="card mt-6 p-5 lg:hidden">
+              <summary class="cursor-pointer font-semibold">In this guide</summary>
+              <nav class="toc mt-3" aria-label="In this guide">
+                {toc.map((h) => (
+                  <a href={`#${h.slug}`} class={`depth-${h.depth}`}>
+                    {h.text}
+                  </a>
+                ))}
+              </nav>
+            </details>
+          )
+        }
+
+        <div class="prose mt-10">
+          <Content components={components} />
+        </div>
+
+        <AdSlot name="leaderboard" class="my-12" />
+
+        <section class="card mt-12 flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between md:p-8" aria-labelledby="next-step">
+          <div>
+            <p id="next-step" class="eyebrow">Your next step</p>
+            <p class="mt-2 max-w-xl text-[1.08rem] text-ink">{d.nextStep.text}</p>
+          </div>
+          <a href={href(d.nextStep.href)} class="btn btn-dark shrink-0">
+            {d.nextStep.label} <Icon name="arrow-right" size={16} class="arrow" />
+          </a>
+        </section>
+
+        {
+          d.faqs.length > 0 && (
+            <section class="mt-16" aria-labelledby="faqs">
+              <h2 id="faqs" class="text-[1.9rem]">
+                Questions people ask
+              </h2>
+              <div class="mt-4">
+                <Faq items={d.faqs} />
+              </div>
+            </section>
+          )
+        }
+
+        {
+          d.sources.length > 0 && (
+            <section class="mt-16" aria-labelledby="sources">
+              <h2 id="sources" class="text-[1.6rem]">
+                Sources
+              </h2>
+              <p class="mt-2 text-[15px] text-muted">
+                Primary legislation and official guidance come first. Where we rely on commentary, we say so.
+              </p>
+              <ol class="mt-5 space-y-3">
+                {d.sources.map((s, i) => (
+                  <li class="flex gap-3 text-[15px]">
+                    <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-paper-2 text-[12px] font-bold text-ink-2">
+                      {i + 1}
+                    </span>
+                    <span>
+                      <a href={s.url} class="font-medium text-teal underline underline-offset-2" rel="noopener" target="_blank">
+                        {s.title}
+                      </a>
+                      {(s.publisher || s.date) && (
+                        <span class="text-muted">
+                          {' '}
+                          {[s.publisher, s.date].filter(Boolean).join(', ')}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )
+        }
+
+        <div class="mt-16">
+          <AuditCta
+            title={d.auditCta?.title}
+            text={d.auditCta?.text}
+            campaign={d.auditCta?.campaign || 'guide'}
+            content={guide.id}
+          />
+        </div>
+      </div>
+
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 space-y-8">
+          {
+            toc.length > 2 && (
+              <nav class="toc" data-toc aria-label="In this guide">
+                <p class="mb-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">In this guide</p>
+                {toc.map((h) => (
+                  <a href={`#${h.slug}`} class={`depth-${h.depth}`}>
+                    {h.text}
+                  </a>
+                ))}
+              </nav>
+            )
+          }
+          <AdSlot name="sidebar" />
+        </div>
+      </aside>
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="container mt-24" aria-labelledby="related">
+          <div class="flex items-end justify-between gap-4">
+            <h2 id="related" class="text-[1.9rem]">
+              Read next
+            </h2>
+            <a href={href('/guides/')} class="text-[15px] font-medium text-teal no-underline">
+              All guides
+            </a>
+          </div>
+          <div class="mt-6 grid gap-5 md:grid-cols-3">
+            {related.map((g, i) => (
+              <GuideCard guide={g} i={i} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </article>
+</Base>

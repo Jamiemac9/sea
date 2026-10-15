@@ -1,0 +1,25 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  type?: 'note' | 'watch' | 'practice' | 'grey';
+  title?: string;
+}
+
+const { type = 'note', title } = Astro.props;
+const meta: Record<NonNullable<Props['type']>, { icon: IconName; label: string }> = {
+  note: { icon: 'info', label: 'Good to know' },
+  watch: { icon: 'alert', label: 'Watch out' },
+  practice: { icon: 'bulb', label: 'Good practice' },
+  grey: { icon: 'help', label: 'Grey area' },
+};
+const m = meta[type];
+---
+
+<aside class:list={['callout not-prose', `callout-${type}`]}>
+  <span class="callout-icon"><Icon name={m.icon} size={18} /></span>
+  <div class="callout-body text-[0.98rem] leading-relaxed text-ink-2">
+    <p class="callout-title">{title || m.label}</p>
+    <slot />
+  </div>
+</aside>

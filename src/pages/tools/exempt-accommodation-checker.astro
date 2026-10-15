@@ -1,0 +1,341 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import { href } from '@/lib/url';
+
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const ld = {
+  '@type': 'WebApplication',
+  name: 'Exempt accommodation checker',
+  url: `${origin}${href('/tools/exempt-accommodation-checker/')}`,
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Any',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+  description: 'Answer six questions to see which category of specified accommodation a supported housing scheme is likely to fall into.',
+};
+
+const questions = [
+  {
+    id: 'landlord',
+    title: 'Who grants the resident their tenancy or licence?',
+    help: 'This is the landlord for Housing Benefit purposes, which may not be the owner of the building.',
+    options: [
+      { value: 'rp', label: 'Housing association or registered provider' },
+      { value: 'charity', label: 'Registered charity' },
+      { value: 'voluntary', label: 'Voluntary organisation, such as a not-for-profit CIC' },
+      { value: 'county', label: 'Non-metropolitan county council' },
+      { value: 'la', label: 'Another council, such as a district, unitary or London borough' },
+      { value: 'private', label: 'Private company or individual' },
+    ],
+  },
+  {
+    id: 'refuge',
+    title: 'Is the building used wholly or mainly as non-permanent accommodation for people who have left home because of domestic abuse?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+    ],
+  },
+  {
+    id: 'hostel',
+    title: 'Is it a council-run hostel that is not self-contained and not a care home, with board or cooking facilities?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+    ],
+  },
+  {
+    id: 'support',
+    title: 'Does the resident receive care, support or supervision that goes beyond ordinary housing management?',
+    help: 'For example help to manage the tenancy, budgeting, emotional support, linking with services, or supervision because of risk.',
+    options: [
+      { value: 'yes', label: 'Yes, regular and recorded' },
+      { value: 'minimal', label: 'Only a little, or not regularly' },
+      { value: 'no', label: 'No' },
+    ],
+  },
+  {
+    id: 'provider',
+    title: 'Who provides that support?',
+    options: [
+      { value: 'landlord', label: "The landlord's own staff" },
+      { value: 'behalf', label: 'Another organisation, under a written agreement to act for the landlord' },
+      { value: 'separate', label: 'Another organisation working for the council or itself, such as a commissioned care provider' },
+      { value: 'unsure', label: 'Not sure' },
+    ],
+  },
+  {
+    id: 'admitted',
+    title: 'Was the resident given the place in order to meet a need for care, support or supervision?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+    ],
+  },
+];
+---
+
+<Base
+  title="Exempt accommodation checker"
+  description="Answer six questions to see whether a supported housing scheme is likely to be exempt accommodation, a managed property, a refuge or a council hostel, and why."
+  jsonLd={[ld]}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Tools', url: '/tools/' },
+    { name: 'Exempt accommodation checker', url: '/tools/exempt-accommodation-checker/' },
+  ]}
+>
+  <PageHero
+    eyebrow="Free tool, about 3 minutes"
+    title="Exempt accommodation checker"
+    lede="Answer up to six questions about one scheme. You will see the specified accommodation category it is most likely to fall into, the reasons, and the evidence a council will want."
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'Tools', url: '/tools/' },
+      { name: 'Exempt accommodation checker', url: '/tools/exempt-accommodation-checker/' },
+    ]}
+  />
+
+  <div class="container grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
+    <div class="min-w-0">
+      <form class="space-y-4" data-checker>
+        {
+          questions.map((q, i) => (
+            <fieldset class="card p-6 md:p-7" data-q={q.id} hidden={i > 0}>
+              <legend class="sr-only">{q.title}</legend>
+              <p class="text-[13px] font-semibold uppercase tracking-[0.08em] text-muted">Question {i + 1}</p>
+              <p class="mt-2 font-display text-[1.3rem] font-semibold leading-snug" aria-hidden="true">{q.title}</p>
+              {q.help && <p class="mt-2 text-[14.5px] text-muted">{q.help}</p>}
+              <div class="mt-5 grid gap-2.5 sm:grid-cols-2">
+                {q.options.map((o) => (
+                  <label class="option">
+                    <input type="radio" name={q.id} value={o.value} />
+                    <span class="text-[15px] font-medium">{o.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))
+        }
+      </form>
+
+      <section class="card mt-6 overflow-hidden" data-outcome hidden aria-live="polite">
+        <div class="p-6 md:p-8" data-outcome-head>
+          <p class="eyebrow">Likely outcome</p>
+          <h2 class="mt-3 text-[2rem] leading-tight" data-outcome-title></h2>
+          <p class="mt-3 text-ink-2" data-outcome-text></p>
+        </div>
+        <div class="grid gap-6 border-t border-line p-6 md:grid-cols-2 md:p-8">
+          <div>
+            <h3 class="text-[1.1rem]">What it means for rent</h3>
+            <p class="mt-2 text-[15px] text-ink-2" data-outcome-rent></p>
+          </div>
+          <div>
+            <h3 class="text-[1.1rem]">Evidence to have ready</h3>
+            <ul class="mt-2 space-y-1.5 text-[15px] text-ink-2" data-outcome-evidence></ul>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 border-t border-line p-6 md:p-8">
+          <a class="btn btn-dark btn-sm" data-outcome-link href="#">Read the guide <Icon name="arrow-right" size={15} class="arrow" /></a>
+          <button type="button" class="btn btn-ghost btn-sm" data-reset>Check another scheme</button>
+        </div>
+        <p class="border-t border-line bg-paper-2 px-6 py-4 text-[13.5px] text-muted md:px-8">
+          This is a guide based on your answers, not a decision. The council decides each Housing Benefit claim on its own facts and evidence.
+        </p>
+      </section>
+
+      <div class="mt-12">
+        <AuditCta
+          title="Want a firm answer, scheme by scheme?"
+          text="SEA Audit reviews your leases, support agreements and resident files and gives a written view on which category each scheme meets, with the evidence gaps to close."
+          campaign="checker"
+        />
+      </div>
+    </div>
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 space-y-6">
+        <div class="card p-6">
+          <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">The four categories</p>
+          <ol class="mt-4 space-y-3 text-[14.5px] text-ink-2">
+            <li><strong class="text-ink">1.</strong> Exempt accommodation</li>
+            <li><strong class="text-ink">2.</strong> Managed property</li>
+            <li><strong class="text-ink">3.</strong> Refuge</li>
+            <li><strong class="text-ink">4.</strong> Local authority hostel</li>
+          </ol>
+          <a href={href('/guides/specified-accommodation-categories/')} class="mt-5 inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-teal no-underline">Compare them <Icon name="arrow-right" size={15} /></a>
+        </div>
+        <AdSlot name="sidebar" />
+      </div>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  type Outcome = { title: string; text: string; rent: string; evidence: string[]; link: string; tone: 'good' | 'mid' | 'none' };
+  const base = (window as unknown as { __seahub: { base: string } }).__seahub.base.replace(/\/$/, '');
+  const form = document.querySelector<HTMLFormElement>('[data-checker]')!;
+  const box = document.querySelector<HTMLElement>('[data-outcome]')!;
+  const fs = (id: string) => form.querySelector<HTMLFieldSetElement>(`[data-q="${id}"]`)!;
+  const val = (id: string) => (form.querySelector<HTMLInputElement>(`input[name="${id}"]:checked`)?.value || '') as string;
+
+  const qualifying = ['rp', 'charity', 'voluntary', 'county'];
+  const common = ["Proof of the landlord's legal status", 'Occupancy agreement and any lease or management agreement'];
+
+  const outcomes: Record<string, Outcome> = {
+    cat1: {
+      title: 'Likely category 1: exempt accommodation',
+      text: 'The landlord is a qualifying body and the landlord, or someone acting for it, provides care, support or supervision. The council will still test whether the support is more than minimal.',
+      rent: 'The older rent rules apply. The council starts from the actual rent and can only cut it if it is unreasonably high compared with suitable alternative accommodation, or the home is too large.',
+      evidence: [...common, 'Any agreement showing a support provider acts for the landlord', 'Needs assessments, support plans and dated support records', 'A rent and service charge breakdown'],
+      link: '/guides/what-is-exempt-accommodation/',
+      tone: 'good',
+    },
+    cat1unsure: {
+      title: 'Possibly category 1, depending on who the support provider acts for',
+      text: "If the support provider acts on the landlord's behalf, the scheme could be exempt accommodation. If it acts for the council or for itself, it is more likely to be a managed property, as long as the resident was admitted to meet a support need.",
+      rent: 'The answer changes the rent rules. Category 1 keeps the older rules on rent, while category 2 uses the standard Housing Benefit rules.',
+      evidence: [...common, 'The agreement between the landlord and the support provider', 'Who commissions and pays for the support', 'Support plans and records'],
+      link: '/guides/grey-areas-in-exempt-accommodation/',
+      tone: 'mid',
+    },
+    cat2: {
+      title: 'Likely category 2: managed property',
+      text: 'The landlord is a qualifying body, the resident was admitted to meet a need for care, support or supervision and receives it, but the support does not come from the landlord or someone acting for it.',
+      rent: 'Rent is paid through Housing Benefit under the standard rules, without the extra protection exempt accommodation has.',
+      evidence: [...common, 'The referral or allocation record showing why the resident was admitted', 'Evidence the resident receives support, from whoever provides it'],
+      link: '/guides/specified-accommodation-categories/',
+      tone: 'mid',
+    },
+    cat3: {
+      title: 'Likely category 3: refuge',
+      text: 'The accommodation is provided by a council or not-for-profit body, and the building is used wholly or mainly as non-permanent accommodation for people who have left home because of domestic abuse.',
+      rent: 'Rent is paid through Housing Benefit, including for residents on Universal Credit. There is no separate support test for this category.',
+      evidence: [...common, 'Evidence of how the building is used', 'Confirmation the resident left home because of domestic abuse'],
+      link: '/guides/domestic-abuse-safe-accommodation/',
+      tone: 'good',
+    },
+    cat4: {
+      title: 'Likely category 4: local authority hostel',
+      text: 'The council runs a non-self-contained hostel with board or cooking facilities, and the resident receives care, support or supervision.',
+      rent: 'Rent is paid through Housing Benefit under the standard rules.',
+      evidence: ['Evidence the council owns or manages the hostel', 'Evidence of support provided to the resident'],
+      link: '/guides/specified-accommodation-categories/',
+      tone: 'good',
+    },
+    privateLandlord: {
+      title: 'Unlikely to be specified accommodation',
+      text: 'A private company or individual cannot be the landlord for exempt accommodation or a managed property. Many schemes solve this by leasing the building to a housing association, charity or voluntary organisation, which then becomes the landlord.',
+      rent: 'Help with rent would normally come through the Universal Credit housing element or Housing Benefit under Local Housing Allowance rules.',
+      evidence: ['If a lease to a qualifying body is planned, the draft lease and management agreement'],
+      link: '/guides/what-is-exempt-accommodation/',
+      tone: 'none',
+    },
+    laOther: {
+      title: 'Not exempt accommodation or a managed property',
+      text: 'Councils other than non-metropolitan county councils cannot be the landlord for categories 1 or 2. Council accommodation can still be a refuge or a local authority hostel, and is often temporary accommodation under homelessness law.',
+      rent: 'Rent is usually paid under the rules for council or temporary accommodation.',
+      evidence: ['Which homelessness duty the placement is made under, if any'],
+      link: '/guides/emergency-accommodation/',
+      tone: 'none',
+    },
+    noSupport: {
+      title: 'Unlikely to be specified accommodation',
+      text: 'Without care, support or supervision that is more than minimal, the scheme does not meet the tests for exempt accommodation, a managed property or a council hostel. Ordinary housing management does not count.',
+      rent: 'Help with rent would usually come through the Universal Credit housing element or standard Housing Benefit rules.',
+      evidence: ['If support is provided but not recorded, start recording it now with dates, times and what was done'],
+      link: '/guides/grey-areas-in-exempt-accommodation/',
+      tone: 'none',
+    },
+    notAdmitted: {
+      title: 'Unlikely to be specified accommodation',
+      text: 'The support comes from someone other than the landlord, so category 1 does not apply, and the resident was not admitted to meet a support need, so category 2 does not apply either.',
+      rent: 'Help with rent would usually come through the Universal Credit housing element or standard Housing Benefit rules.',
+      evidence: ['Referral and allocation records, in case the resident was in fact admitted because of a support need'],
+      link: '/guides/specified-accommodation-categories/',
+      tone: 'none',
+    },
+  };
+
+  const visible = (id: string, on: boolean) => {
+    fs(id).hidden = !on;
+    if (!on) fs(id).querySelectorAll<HTMLInputElement>('input').forEach((i) => (i.checked = false));
+  };
+
+  const decide = (): string | null => {
+    const landlord = val('landlord');
+    if (!landlord) return null;
+    if (landlord === 'private') return 'privateLandlord';
+    const refuge = val('refuge');
+    if (!refuge) return null;
+    if (refuge === 'yes') return 'cat3';
+    if (landlord === 'la') {
+      const hostel = val('hostel');
+      if (!hostel) return null;
+      if (hostel === 'no') return 'laOther';
+      const support = val('support');
+      if (!support) return null;
+      return support === 'yes' ? 'cat4' : 'noSupport';
+    }
+    const support = val('support');
+    if (!support) return null;
+    if (support !== 'yes') return 'noSupport';
+    const provider = val('provider');
+    if (!provider) return null;
+    if (provider === 'landlord' || provider === 'behalf') return 'cat1';
+    const admitted = val('admitted');
+    if (!admitted) return null;
+    if (provider === 'unsure') return admitted === 'yes' ? 'cat1unsure' : 'notAdmitted';
+    return admitted === 'yes' ? 'cat2' : 'notAdmitted';
+  };
+
+  const flow = () => {
+    const landlord = val('landlord');
+    const isLa = landlord === 'la';
+    visible('refuge', Boolean(landlord) && landlord !== 'private');
+    const refuge = val('refuge');
+    const pastRefuge = refuge === 'no';
+    visible('hostel', isLa && pastRefuge);
+    const hostelOk = !isLa || val('hostel') === 'yes';
+    visible('support', pastRefuge && hostelOk && (isLa || qualifying.includes(landlord)));
+    const support = val('support');
+    visible('provider', !isLa && pastRefuge && support === 'yes');
+    const provider = val('provider');
+    visible('admitted', !isLa && support === 'yes' && (provider === 'separate' || provider === 'unsure'));
+
+    const key = decide();
+    if (!key) {
+      box.hidden = true;
+      return;
+    }
+    const o = outcomes[key];
+    box.hidden = false;
+    box.querySelector('[data-outcome-title]')!.textContent = o.title;
+    box.querySelector('[data-outcome-text]')!.textContent = o.text;
+    box.querySelector('[data-outcome-rent]')!.textContent = o.rent;
+    box.querySelector('[data-outcome-evidence]')!.innerHTML = o.evidence
+      .map((e) => `<li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 rounded-[1px] bg-teal"></span><span>${e}</span></li>`)
+      .join('');
+    box.querySelector<HTMLAnchorElement>('[data-outcome-link]')!.href = base + o.link;
+    const head = box.querySelector<HTMLElement>('[data-outcome-head]')!;
+    head.style.background =
+      o.tone === 'good' ? 'var(--mint-2)' : o.tone === 'mid' ? 'var(--sun-soft)' : 'var(--coral-soft)';
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  form.addEventListener('change', (e) => {
+    // Changing an earlier answer clears the ones after it, so the path stays consistent.
+    const name = (e.target as HTMLInputElement).name;
+    const order = ['landlord', 'refuge', 'hostel', 'support', 'provider', 'admitted'];
+    order.slice(order.indexOf(name) + 1).forEach((id) => fs(id).querySelectorAll<HTMLInputElement>('input').forEach((i) => (i.checked = false)));
+    flow();
+  });
+  document.querySelector('[data-reset]')?.addEventListener('click', () => {
+    form.reset();
+    flow();
+    form.scrollIntoView({ behavior: 'smooth' });
+  });
+</script>

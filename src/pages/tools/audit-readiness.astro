@@ -1,0 +1,425 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import { areas, answerOptions } from '@/data/readiness';
+import { audit, auditUrl } from '@/site.config';
+import { href } from '@/lib/url';
+
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const total = areas.reduce((n, a) => n + a.questions.length, 0);
+const ld = {
+  '@type': 'WebApplication',
+  name: 'Supported housing audit readiness check',
+  url: `${origin}${href('/tools/audit-readiness/')}`,
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Any',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+  description: `${total} questions across ${areas.length} areas, scored against what councils and licensing look for in supported exempt accommodation.`,
+};
+const clientData = {
+  areas: areas.map((a) => ({ id: a.id, title: a.title, questions: a.questions.map((q) => ({ id: q.id, text: q.text, action: q.action, href: href(q.href) })) })),
+  leadEndpoint: audit.leadEndpoint,
+  handoff: auditUrl('readiness-check', 'results'),
+};
+---
+
+<Base
+  title="Supported housing audit readiness check"
+  description={`A free ${total}-question check of your supported housing service against what councils and licensing look for. About 10 minutes, with a scored action list.`}
+  jsonLd={[ld]}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Tools', url: '/tools/' },
+    { name: 'Audit readiness check', url: '/tools/audit-readiness/' },
+  ]}
+>
+  <PageHero
+    eyebrow="Free tool, about 10 minutes"
+    title="Audit readiness check"
+    lede={`${total} questions across ${areas.length} areas. Answer for your service as a whole, or for one scheme. You get a score for each area and the five actions that will make the biggest difference.`}
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'Tools', url: '/tools/' },
+      { name: 'Audit readiness check', url: '/tools/audit-readiness/' },
+    ]}
+  >
+    <p class="reveal mt-5 flex items-center gap-2 text-[14px] text-muted" style="--i:3">
+      <Icon name="lock" size={15} /> Your answers stay in your browser unless you choose to send them.
+    </p>
+  </PageHero>
+
+  <script type="application/json" id="readiness-data" set:html={JSON.stringify(clientData)} />
+
+  <div class="container grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
+    <div class="min-w-0">
+      <form class="card p-6 md:p-9" data-readiness novalidate>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="text-[14px] font-semibold text-muted" data-step-label aria-live="polite">Step 1 of {areas.length}</p>
+          <p class="text-[14px] text-muted"><span data-answered>0</span> of {total} answered</p>
+        </div>
+        <div class="meter mt-3" aria-hidden="true"><span data-progress style="--w:0%"></span></div>
+
+        {
+          areas.map((a, ai) => (
+            <fieldset class="mt-8" data-step={ai}>
+              <legend class="font-display text-[1.6rem] font-semibold leading-tight">{a.title}</legend>
+              <p class="mt-1.5 text-muted">{a.blurb}</p>
+              <ol class="mt-6 space-y-6">
+                {a.questions.map((q, qi) => (
+                  <li class="border-t border-line pt-5">
+                    <p class="font-medium text-ink" id={`q-${q.id}`}>
+                      <span class="mr-1.5 text-muted">{ai * 3 + qi + 1}.</span>
+                      {q.text}
+                    </p>
+                    <div class="seg mt-3" role="radiogroup" aria-labelledby={`q-${q.id}`}>
+                      {answerOptions.map((o) => (
+                        <label>
+                          <input type="radio" name={q.id} value={o.value} />
+                          <span>{o.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </fieldset>
+          ))
+        }
+
+        <div class="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6">
+          <button type="button" class="btn btn-ghost" data-prev>Back</button>
+          <div class="flex gap-3">
+            <button type="button" class="btn btn-dark" data-next>Next area <Icon name="arrow-right" size={16} class="arrow" /></button>
+            <button type="submit" class="btn btn-primary" data-finish hidden>See my results <Icon name="arrow-right" size={16} class="arrow" /></button>
+          </div>
+        </div>
+      </form>
+
+      <section class="mt-10 space-y-8" data-results hidden aria-live="polite" aria-labelledby="results-title">
+        <div class="card overflow-hidden">
+          <div class="grid gap-8 p-6 md:grid-cols-[220px_1fr] md:p-9">
+            <div class="relative mx-auto h-[200px] w-[200px]">
+              <svg viewBox="0 0 120 120" class="h-full w-full -rotate-90" aria-hidden="true">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="var(--paper-2)" stroke-width="12"></circle>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="url(#scoreGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" data-ring style="transition: stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1)"></circle>
+                <defs>
+                  <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--teal)"></stop><stop offset="1" stop-color="#9ACD32"></stop></linearGradient>
+                </defs>
+              </svg>
+              <div class="absolute inset-0 grid place-items-center text-center">
+                <div>
+                  <p class="stat-num" data-score>0</p>
+                  <p class="text-[13px] text-muted">out of 100</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="eyebrow">Your result</p>
+              <h2 id="results-title" class="mt-3 text-[2rem] leading-tight" data-band>Result</h2>
+              <p class="mt-3 text-ink-2" data-band-text></p>
+              <p class="mt-3 text-[14px] text-muted" data-unsure></p>
+            </div>
+          </div>
+          <div class="border-t border-line p-6 md:p-9">
+            <h3 class="text-[1.3rem]">Score by area</h3>
+            <ul class="mt-5 grid gap-x-10 gap-y-4 md:grid-cols-2" data-areas></ul>
+          </div>
+        </div>
+
+        <div class="card p-6 md:p-9">
+          <p class="eyebrow">Do these first</p>
+          <h3 class="mt-3 text-[1.6rem]">Your five priority actions</h3>
+          <ol class="mt-5 space-y-4" data-actions></ol>
+        </div>
+
+        <div class="dark-band relative overflow-hidden rounded-[28px] p-6 md:p-9 no-print" data-lead>
+          <p class="eyebrow">Next step</p>
+          <h3 class="mt-3 max-w-xl text-[1.7rem] leading-tight">Send these results to SEA Audit for a free review call</h3>
+          <p class="mt-2 max-w-xl text-[#b9cdc8]">An auditor will look at your scores and tell you which gaps a council or licensing officer is most likely to pick up.</p>
+          <form class="mt-6 grid gap-3 md:grid-cols-2" data-lead-form>
+            <label class="block">
+              <span class="text-[14px] text-[#b9cdc8]">Your name</span>
+              <input class="field mt-1" name="name" autocomplete="name" required />
+            </label>
+            <label class="block">
+              <span class="text-[14px] text-[#b9cdc8]">Work email</span>
+              <input class="field mt-1" type="email" name="email" autocomplete="email" required />
+            </label>
+            <label class="block">
+              <span class="text-[14px] text-[#b9cdc8]">Organisation</span>
+              <input class="field mt-1" name="organisation" autocomplete="organization" />
+            </label>
+            <label class="block">
+              <span class="text-[14px] text-[#b9cdc8]">Number of schemes</span>
+              <select class="field mt-1" name="schemes">
+                <option value="">Choose</option>
+                <option>1 to 5</option>
+                <option>6 to 20</option>
+                <option>21 to 50</option>
+                <option>More than 50</option>
+              </select>
+            </label>
+            <label class="flex items-start gap-3 text-[14px] text-[#b9cdc8] md:col-span-2">
+              <input type="checkbox" name="consent" required class="mt-1 h-4 w-4 accent-[var(--lime)]" />
+              <span>I agree to SEA Audit contacting me about these results. See the <a href={href('/privacy/')} class="underline">privacy notice</a>.</span>
+            </label>
+            <div class="flex flex-wrap items-center gap-3 md:col-span-2">
+              <button type="submit" class="btn btn-lime">Send my results <Icon name="arrow-right" size={16} class="arrow" /></button>
+              <p class="text-[14px] text-[#b9cdc8]" data-lead-status role="status"></p>
+            </div>
+          </form>
+        </div>
+
+        <div class="flex flex-wrap gap-3 no-print">
+          <button type="button" class="btn btn-ghost" onclick="window.print()"><Icon name="printer" size={16} /> Print or save as PDF</button>
+          <button type="button" class="btn btn-ghost" data-restart>Start again</button>
+        </div>
+      </section>
+      <noscript><p class="mt-6 text-muted">This check needs JavaScript to score your answers. The questions above still work as a checklist.</p></noscript>
+    </div>
+
+    <aside class="hidden lg:block">
+      <div class="sticky top-24 space-y-6">
+        <div class="card p-6">
+          <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">The eight areas</p>
+          <ol class="mt-4 space-y-2.5 text-[14.5px]" data-step-list>
+            {
+              areas.map((a, i) => (
+                <li>
+                  <button type="button" class="flex w-full items-center gap-3 text-left text-ink-2 hover:text-ink" data-goto={i}>
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-line-2 text-[12px] font-bold" data-step-dot>{i + 1}</span>
+                    {a.title}
+                  </button>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <AdSlot name="sidebar" />
+      </div>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  type Q = { id: string; text: string; action: string; href: string };
+  type A = { id: string; title: string; questions: Q[] };
+  const data = JSON.parse(document.getElementById('readiness-data')!.textContent || '{}') as {
+    areas: A[];
+    leadEndpoint: string;
+    handoff: string;
+  };
+  const KEY = 'seahub-readiness';
+  const form = document.querySelector<HTMLFormElement>('[data-readiness]')!;
+  const steps = Array.from(form.querySelectorAll<HTMLFieldSetElement>('[data-step]'));
+  const prev = form.querySelector<HTMLButtonElement>('[data-prev]')!;
+  const next = form.querySelector<HTMLButtonElement>('[data-next]')!;
+  const finish = form.querySelector<HTMLButtonElement>('[data-finish]')!;
+  const label = form.querySelector<HTMLElement>('[data-step-label]')!;
+  const progress = form.querySelector<HTMLElement>('[data-progress]')!;
+  const answeredEl = form.querySelector<HTMLElement>('[data-answered]')!;
+  const results = document.querySelector<HTMLElement>('[data-results]')!;
+  const dots = Array.from(document.querySelectorAll<HTMLElement>('[data-step-dot]'));
+  const total = data.areas.reduce((n, a) => n + a.questions.length, 0);
+  let current = 0;
+
+  const answers = (): Record<string, number> => {
+    const out: Record<string, number> = {};
+    new FormData(form).forEach((v, k) => (out[k] = Number(v)));
+    return out;
+  };
+
+  const save = () => {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(answers()));
+    } catch {
+      /* storage blocked */
+    }
+  };
+
+  const restore = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || '{}') as Record<string, number>;
+      Object.entries(saved).forEach(([k, v]) => {
+        const input = form.querySelector<HTMLInputElement>(`input[name="${k}"][value="${v}"]`);
+        if (input) input.checked = true;
+      });
+    } catch {
+      /* nothing saved */
+    }
+  };
+
+  const show = (i: number) => {
+    current = Math.max(0, Math.min(steps.length - 1, i));
+    steps.forEach((s, j) => (s.hidden = j !== current));
+    prev.disabled = current === 0;
+    prev.style.visibility = current === 0 ? 'hidden' : 'visible';
+    const last = current === steps.length - 1;
+    next.hidden = last;
+    finish.hidden = !last;
+    label.textContent = `Step ${current + 1} of ${steps.length}: ${data.areas[current].title}`;
+    dots.forEach((d, j) => {
+      d.style.background = j === current ? 'var(--ink)' : '';
+      d.style.color = j === current ? 'var(--paper)' : '';
+    });
+    update();
+  };
+
+  const update = () => {
+    const n = Object.keys(answers()).length;
+    answeredEl.textContent = String(n);
+    progress.style.setProperty('--w', `${(n / total) * 100}%`);
+    data.areas.forEach((a, j) => {
+      const done = a.questions.every((q) => form.querySelector(`input[name="${q.id}"]:checked`));
+      if (done && j !== current) {
+        dots[j].style.background = 'var(--mint)';
+        dots[j].style.color = 'var(--teal)';
+      }
+    });
+  };
+
+  const band = (score: number) => {
+    if (score >= 80) return ['Strong foundations', 'Your answers suggest most of what a council or licensing officer will look for is in place. Focus on keeping evidence current.'];
+    if (score >= 60) return ['Good foundations, some gaps', 'The basics are there, but some gaps could lead to questions in a Housing Benefit review or a licence application. Fix the priority actions first.'];
+    if (score >= 40) return ['Significant gaps', 'Several areas would be hard to evidence today. A council review or licence application could expose them. Start with the priority actions below.'];
+    return ['High risk', 'Your answers suggest the service would struggle to evidence the basics. Treat the priority actions as urgent, starting with anything that affects resident safety.'];
+  };
+
+  const compute = () => {
+    const a = answers();
+    let unsure = 0;
+    const perArea = data.areas.map((area) => {
+      const pts = area.questions.reduce((n, q) => {
+        const v = a[q.id];
+        if (v === -1) unsure++;
+        return n + (v > 0 ? v : 0);
+      }, 0);
+      return { area, score: Math.round((pts / (area.questions.length * 2)) * 100) };
+    });
+    const overall = Math.round(perArea.reduce((n, x) => n + x.score, 0) / perArea.length);
+    // Gaps: "No" and "Not sure" first, then "Partly", then unanswered. Order by weakest area.
+    const order = [...perArea].sort((x, y) => x.score - y.score).map((x) => x.area.id);
+    const gaps = data.areas
+      .flatMap((area) => area.questions.map((q) => ({ q, area, v: a[q.id] })))
+      .filter((g) => g.v === undefined || g.v < 2)
+      .sort((x, y) => {
+        const rank = (v: number | undefined) => (v === 0 || v === -1 ? 0 : v === 1 ? 1 : 2);
+        return rank(x.v) - rank(y.v) || order.indexOf(x.area.id) - order.indexOf(y.area.id);
+      });
+    return { overall, perArea, gaps, unsure };
+  };
+
+  const render = () => {
+    const { overall, perArea, gaps, unsure } = compute();
+    const [title, text] = band(overall);
+    results.hidden = false;
+    results.querySelector('[data-band]')!.textContent = title;
+    results.querySelector('[data-band-text]')!.textContent = text;
+    results.querySelector('[data-unsure]')!.textContent = unsure
+      ? `You answered "Not sure" ${unsure} time${unsure > 1 ? 's' : ''}. Those count as gaps, because a reviewer will treat missing evidence the same way.`
+      : '';
+    const scoreEl = results.querySelector<HTMLElement>('[data-score]')!;
+    const ring = results.querySelector<SVGCircleElement>('[data-ring]')!;
+    requestAnimationFrame(() => ring.setAttribute('stroke-dashoffset', String(326.7 * (1 - overall / 100))));
+    const start = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / 1100);
+      scoreEl.textContent = String(Math.round(overall * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+
+    results.querySelector('[data-areas]')!.innerHTML = perArea
+      .map(
+        (x) => `<li><div class="flex items-center justify-between text-[15px]"><span class="font-medium">${x.area.title}</span><span class="font-semibold tabular-nums">${x.score}</span></div><div class="meter mt-2"><span style="--w:${x.score}%"></span></div></li>`,
+      )
+      .join('');
+    results.querySelector('[data-actions]')!.innerHTML = gaps.length
+      ? gaps
+          .slice(0, 5)
+          .map(
+            (g, i) => `<li class="flex gap-4"><span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-[14px] font-bold text-paper">${i + 1}</span><span><span class="block font-medium text-ink">${g.q.action}</span><span class="mt-1 block text-[14px] text-muted">${g.area.title}. <a class="text-teal underline underline-offset-2" href="${g.q.href}">Read the guide</a></span></span></li>`,
+          )
+          .join('')
+      : '<li class="text-ink-2">No gaps from your answers. Keep the evidence current and repeat this check every six months.</li>';
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return { overall, perArea, gaps };
+  };
+
+  next.addEventListener('click', () => {
+    show(current + 1);
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  prev.addEventListener('click', () => show(current - 1));
+  document.querySelectorAll<HTMLButtonElement>('[data-goto]').forEach((b) =>
+    b.addEventListener('click', () => show(Number(b.dataset.goto))),
+  );
+  form.addEventListener('change', () => {
+    save();
+    update();
+  });
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    render();
+  });
+  document.querySelector('[data-restart]')?.addEventListener('click', () => {
+    form.reset();
+    try {
+      localStorage.removeItem(KEY);
+    } catch {
+      /* storage blocked */
+    }
+    results.hidden = true;
+    show(0);
+    form.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Hand results to SEA Audit: POST to the lead endpoint if configured, otherwise open seaaudit.com with a summary.
+  const leadForm = document.querySelector<HTMLFormElement>('[data-lead-form]')!;
+  const status = document.querySelector<HTMLElement>('[data-lead-status]')!;
+  leadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!leadForm.reportValidity()) return;
+    const { overall, perArea, gaps } = compute();
+    const contact = Object.fromEntries(new FormData(leadForm)) as Record<string, string>;
+    const payload = {
+      source: 'sea-hub-readiness-check',
+      submittedAt: new Date().toISOString(),
+      contact: { name: contact.name, email: contact.email, organisation: contact.organisation, schemes: contact.schemes },
+      score: overall,
+      areas: Object.fromEntries(perArea.map((x) => [x.area.id, x.score])),
+      priorityGaps: gaps.slice(0, 5).map((g) => g.q.id),
+      answers: answers(),
+    };
+    if (data.leadEndpoint) {
+      status.textContent = 'Sending...';
+      try {
+        const res = await fetch(data.leadEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        status.textContent = 'Sent. SEA Audit will be in touch.';
+        leadForm.reset();
+      } catch {
+        status.textContent = 'That did not send. Try again, or email us your results.';
+      }
+      return;
+    }
+    const url = new URL(data.handoff);
+    url.searchParams.set('readiness_score', String(overall));
+    url.searchParams.set('areas', perArea.map((x) => `${x.area.id}:${x.score}`).join(','));
+    url.searchParams.set('gaps', payload.priorityGaps.join(','));
+    if (contact.organisation) url.searchParams.set('organisation', contact.organisation);
+    if (contact.schemes) url.searchParams.set('schemes', contact.schemes);
+    window.open(url.toString(), '_blank', 'noopener');
+    status.textContent = 'We opened SEA Audit in a new tab with your scores.';
+  });
+
+  restore();
+  show(0);
+</script>

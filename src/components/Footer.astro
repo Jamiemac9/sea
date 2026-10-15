@@ -1,0 +1,118 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import AdSlot from './AdSlot.astro';
+import { site, auditUrl } from '@/site.config';
+import { href } from '@/lib/url';
+
+interface Props {
+  showAd?: boolean;
+}
+const { showAd = true } = Astro.props;
+
+const columns = [
+  {
+    title: 'Guides',
+    links: [
+      { label: 'What is exempt accommodation?', href: '/guides/what-is-exempt-accommodation/' },
+      { label: 'Specified accommodation categories', href: '/guides/specified-accommodation-categories/' },
+      { label: 'Types of supported housing', href: '/guides/types-of-supported-housing/' },
+      { label: 'Supported living', href: '/guides/supported-living/' },
+      { label: 'Care leavers', href: '/guides/care-leavers-supported-accommodation/' },
+      { label: 'All guides', href: '/guides/' },
+    ],
+  },
+  {
+    title: 'Regulation',
+    links: [
+      { label: 'Regulation tracker', href: '/regulation-tracker/' },
+      { label: 'Licensing and national standards', href: '/guides/supported-housing-regulatory-oversight-act/' },
+      { label: "Renters' Rights Act", href: '/guides/renters-rights-act-supported-accommodation/' },
+      { label: 'Grey areas', href: '/guides/grey-areas-in-exempt-accommodation/' },
+    ],
+  },
+  {
+    title: 'Start here',
+    links: [
+      { label: 'Support providers', href: '/for/support-providers/' },
+      { label: 'Housing providers', href: '/for/housing-providers/' },
+      { label: 'Managing agents', href: '/for/managing-agents/' },
+      { label: 'Proptech teams', href: '/for/proptech/' },
+    ],
+  },
+  {
+    title: 'Hub',
+    links: [
+      { label: 'Tools', href: '/tools/' },
+      { label: 'Glossary', href: '/glossary/' },
+      { label: 'FAQ', href: '/faq/' },
+      { label: 'Resources', href: '/resources/' },
+      { label: 'About and editorial standards', href: '/about/' },
+      { label: 'Advertise', href: '/advertise/' },
+    ],
+  },
+];
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer mt-24 border-t border-line bg-paper-2/60">
+  {
+    showAd && (
+      <div class="container pt-10">
+        <AdSlot name="footer" />
+      </div>
+    )
+  }
+  <div class="container grid gap-12 py-16 lg:grid-cols-[1.2fr_2fr]">
+    <div>
+      <a href={href('/')} class="flex items-center gap-2.5 no-underline">
+        <Logo />
+        <span class="font-display text-xl font-[680]">{site.name}</span>
+      </a>
+      <p class="mt-4 max-w-sm text-[15px] text-muted">
+        {site.tagline}. Published by{' '}
+        <a href={auditUrl('footer', 'publisher')} class="text-teal underline underline-offset-2">
+          SEA Audit
+        </a>
+        , independent auditors of supported housing.
+      </p>
+      <p class="mt-4 max-w-sm text-[13.5px] text-muted">
+        Guidance on this site covers England unless a page says otherwise. It is general information, not legal advice.
+        For a decision about a specific claim or scheme, speak to the council or a specialist adviser.
+      </p>
+      <a href={href('/tools/audit-readiness/')} class="btn btn-dark btn-sm mt-6">
+        Free readiness check <Icon name="arrow-right" size={15} class="arrow" />
+      </a>
+    </div>
+    <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
+      {
+        columns.map((col) => (
+          <div>
+            <p class="font-display text-[15px] font-semibold">{col.title}</p>
+            <ul class="mt-4 space-y-2.5">
+              {col.links.map((l) => (
+                <li>
+                  <a href={href(l.href)} class="text-[14.5px] text-muted no-underline transition hover:text-ink">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  <div class="border-t border-line">
+    <div class="container flex flex-col gap-3 py-6 text-[13.5px] text-muted md:flex-row md:items-center md:justify-between">
+      <p>&copy; {year} {site.legalName}. Contains public sector information licensed under the Open Government Licence v3.0.</p>
+      <div class="flex flex-wrap gap-5">
+        <a href={href('/privacy/')} class="no-underline hover:text-ink">Privacy</a>
+        <a href={href('/cookies/')} class="no-underline hover:text-ink">Cookies</a>
+        <button type="button" class="hover:text-ink" data-consent-open>Cookie settings</button>
+        <a href={href('/llms.txt')} class="no-underline hover:text-ink">llms.txt</a>
+        <a href={href('/rss.xml')} class="no-underline hover:text-ink">RSS</a>
+      </div>
+    </div>
+  </div>
+</footer>

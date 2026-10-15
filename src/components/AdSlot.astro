@@ -1,0 +1,96 @@
+---
+/**
+ * Ad placement. Space is reserved up front (min-height per format) so ads
+ * never push content around, which protects Core Web Vitals (CLS).
+ *
+ * With PUBLIC_ADSENSE_CLIENT and a slot id set, the slot holds an AdSense
+ * unit that is only requested once the visitor has consented and the slot is
+ * near the viewport. The SEA Audit house ad is always in the markup: it shows
+ * when ads are not configured, not consented to, or come back unfilled.
+ */
+import { ads, auditUrl, type AdSlotName } from '@/site.config';
+import { href } from '@/lib/url';
+import Icon from './Icon.astro';
+
+interface Props {
+  name: AdSlotName;
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+const slotId = ads.slots[name];
+const live = ads.provider === 'adsense' && Boolean(slotId);
+
+const houseAds = {
+  leaderboard: {
+    kicker: 'From SEA Audit',
+    title: 'Licensing is coming. Know where your schemes stand before the council does.',
+    cta: 'Take the free readiness check',
+    href: href('/tools/audit-readiness/'),
+    tone: 'dark',
+  },
+  inArticle: {
+    kicker: 'From SEA Audit',
+    title: 'Independent audits of support files, Housing Benefit evidence and property standards.',
+    cta: 'See how an audit works',
+    href: auditUrl('house-ad', 'in-article'),
+    tone: 'mint',
+  },
+  sidebar: {
+    kicker: 'Free tool',
+    title: 'Score your service against the national standards in about 10 minutes.',
+    cta: 'Start the check',
+    href: href('/tools/audit-readiness/'),
+    tone: 'dark',
+  },
+  footer: {
+    kicker: 'From SEA Audit',
+    title: 'Getting a scheme ready for review? Book an independent support and compliance audit.',
+    cta: 'Talk to SEA Audit',
+    href: auditUrl('house-ad', 'footer'),
+    tone: 'mint',
+  },
+} as const;
+const house = houseAds[name];
+const vertical = name === 'sidebar';
+---
+
+<aside class:list={['ad', className]} data-format={name} data-provider={live ? 'adsense' : 'house'} data-ad-slot-wrap>
+  <span class="ad-label" data-ad-label>{live ? 'Advertisement' : 'Promoted by SEA Audit'}</span>
+  {
+    live && (
+      <div class="ad-frame" data-ad-live hidden>
+        <ins
+          class="adsbygoogle"
+          style="display:block"
+          data-ad-client={ads.client}
+          data-ad-slot={slotId}
+          data-ad-format={name === 'inArticle' ? 'fluid' : 'auto'}
+          data-ad-layout={name === 'inArticle' ? 'in-article' : undefined}
+          data-full-width-responsive="true"
+        />
+      </div>
+    )
+  }
+  <div data-ad-house>
+    <a
+      href={house.href}
+      class:list={[
+        'group relative flex overflow-hidden rounded-2xl p-6 no-underline transition hover:-translate-y-0.5',
+        vertical ? 'flex-col gap-5' : 'flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-8',
+        house.tone === 'dark' ? 'dark-band text-[#eaf3ef]' : 'bg-mint-2 text-ink ring-1 ring-line',
+      ]}
+      data-house-ad={name}
+    >
+      <div class="relative max-w-2xl">
+        <p class:list={['text-[12px] font-semibold uppercase tracking-[0.08em]', house.tone === 'dark' ? 'text-lime' : 'text-teal']}>
+          {house.kicker}
+        </p>
+        <p class="mt-1.5 font-display text-[1.2rem] font-semibold leading-snug md:text-[1.35rem]">{house.title}</p>
+      </div>
+      <span class:list={['btn btn-sm shrink-0 self-start', house.tone === 'dark' ? 'btn-lime' : 'btn-dark', !vertical && 'md:self-center']}>
+        {house.cta} <Icon name="arrow-right" size={15} class="arrow" />
+      </span>
+    </a>
+  </div>
+</aside>

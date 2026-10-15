@@ -1,0 +1,6 @@
+---
+/** Markdown tables render through this so they scroll inside their own box on small screens. */
+const props = Astro.props;
+---
+
+<div class="table-wrap not-prose-scroll"><table {...props}><slot /></table></div>

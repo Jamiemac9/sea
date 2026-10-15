@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import GuideCard from '@/components/GuideCard.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import { categories } from '@/content.config';
+import { href } from '@/lib/url';
+
+const guides = (await getCollection('guides')).sort((a, b) => a.data.order - b.data.order);
+const groups = (Object.keys(categories) as (keyof typeof categories)[])
+  .map((key) => ({ key, ...categories[key], items: guides.filter((g) => g.data.category === key) }))
+  .filter((g) => g.items.length);
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const itemList = {
+  '@type': 'CollectionPage',
+  name: 'Supported housing guides',
+  url: `${origin}${href('/guides/')}`,
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: guides.map((g, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: `${origin}${href(`/guides/${g.id}/`)}`,
+      name: g.data.title,
+    })),
+  },
+};
+---
+
+<Base
+  title="Supported housing guides"
+  description="Plain-English guides on exempt accommodation, specified accommodation, supported living, care leavers, emergency housing, rent, licensing and best practice."
+  jsonLd={[itemList]}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Guides', url: '/guides/' },
+  ]}
+>
+  <PageHero
+    eyebrow={`${guides.length} guides`}
+    title="Guides to supported housing in England"
+    lede="Each guide opens with a quick answer and a short version of five points or fewer, then the detail, the questions people ask and the sources we used."
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'Guides', url: '/guides/' },
+    ]}
+  >
+    <nav aria-label="Topics" class="reveal mt-8 flex flex-wrap gap-2" style="--i:3">
+      {
+        groups.map((g) => (
+          <a href={`#${g.key}`} class="chip chip-ink no-underline transition hover:bg-ink hover:text-paper">
+            {g.label} <span class="opacity-60">{g.items.length}</span>
+          </a>
+        ))
+      }
+    </nav>
+  </PageHero>
+
+  <div class="container space-y-20">
+    {
+      groups.map((g, gi) => (
+        <>
+          <section id={g.key} aria-labelledby={`h-${g.key}`} class="scroll-mt-28">
+            <div class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+              <div>
+                <h2 id={`h-${g.key}`} class="text-[2rem]">
+                  {g.label}
+                </h2>
+                <p class="mt-2 max-w-2xl text-muted">{g.blurb}</p>
+              </div>
+            </div>
+            <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {g.items.map((guide, i) => (
+                <GuideCard guide={guide} i={i} />
+              ))}
+            </div>
+          </section>
+          {gi === 1 && <AdSlot name="leaderboard" />}
+        </>
+      ))
+    }
+  </div>
+</Base>

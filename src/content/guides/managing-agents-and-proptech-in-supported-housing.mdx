@@ -1,0 +1,115 @@
+---
+title: A guide for managing agents and proptech teams in supported housing
+seoTitle: Supported housing for managing agents and proptech
+description: "Who carries which duty in supported housing, the data councils and licensing will ask for, and how managing agents and proptech teams can build for it."
+category: practice
+audiences: [managing-agents, proptech, housing-providers]
+published: 2026-10-15
+updated: 2026-10-15
+order: 16
+quickAnswer: "In supported housing the landlord, support provider and managing agent carry different duties, and the paperwork has to say who does what. Managing agents need a clear management agreement and a compliance record. Proptech teams should build around the evidence councils and licensing officers ask for, with proper protection for sensitive data."
+keyPoints:
+  - The landlord stays legally responsible for most duties even when a managing agent does the work, so the agreement must be specific.
+  - Licensing from 2027 will test governance and records, which makes data quality a compliance issue, not an IT issue.
+  - The most useful data points are time-stamped. Move-in date, assessment date, plan review dates, support sessions, incidents and certificate expiry.
+  - Health, offending and support information is special category personal data under UK GDPR and needs a lawful basis, access controls and retention rules.
+  - Damp and mould sensors and repair tracking help registered providers meet Awaab's Law timescales, but only if someone acts on the alerts.
+nextStep:
+  text: List the ten data points a council would ask for on one scheme, and check how long it takes you to produce them.
+  label: Try the readiness check
+  href: /tools/audit-readiness/
+faqs:
+  - q: Is a managing agent responsible for compliance in supported housing?
+    a: The managing agent is responsible for what its agreement says it will do, and can be liable under some laws as the person managing or in control of a property, such as HMO management rules and fire safety law. The landlord remains responsible for its own duties. Write the split down and review it every year.
+  - q: What software do supported housing providers need?
+    a: At minimum, a way to hold resident records, support plans and session notes securely, a property compliance tracker with expiry alerts, a repairs log with timescales, and a way to produce rent and service charge breakdowns. Many providers combine a case management system with a separate property system.
+  - q: What data will supported housing licensing require?
+    a: Draft regulations are due to be consulted on later in 2026. Based on the April 2026 response, expect to evidence fit and proper persons, service manager suitability, needs assessments within four weeks and compliance with the national standards.
+  - q: Can resident support notes be stored in the cloud?
+    a: Yes, if the system meets UK GDPR requirements. That means a lawful basis and a condition for processing special category data, a data processing agreement with the supplier, access controls, encryption, audit logs, a retention policy and, where data leaves the UK, a valid transfer mechanism.
+sources:
+  - title: Supported Housing regulation consultation, government response
+    url: https://www.gov.uk/government/consultations/supported-housing-regulation-consultation/outcome/supported-housing-regulation-consultation-government-response
+    publisher: MHCLG and DWP
+    date: April 2026
+  - title: Housing Act 2004, Part 2 (HMO licensing)
+    url: https://www.legislation.gov.uk/ukpga/2004/34/part/2
+    publisher: legislation.gov.uk
+  - title: Special category data
+    url: https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/special-category-data/
+    publisher: Information Commissioner's Office
+  - title: RSH warns of risks with lease-based provision of specialised supported housing
+    url: https://www.gov.uk/government/news/rsh-warns-of-risks-with-lease-based-provision-of-specialised-supported-housing
+    publisher: Regulator of Social Housing
+related: [property-standards-and-safety, supported-living, how-to-prepare-for-a-supported-housing-audit]
+---
+
+Managing agents and proptech companies are moving into supported housing fast. Investors want assets managed to a standard, providers want systems that save staff time, and councils want evidence. The opportunity is real, and so is the risk of building something that looks good and fails the first council review.
+
+## Who carries which duty
+
+Supported housing usually involves several organisations. Each has its own duties, and some duties can sit with more than one of them.
+
+| Role | Typical duties |
+| --- | --- |
+| Freeholder or investor | Lease terms, structural repairs if the lease says so |
+| Landlord, such as a charity or housing association | Occupancy agreements, rent setting, Housing Benefit evidence, property safety, licensing from 2027 |
+| Support provider | Needs assessments, support plans, support delivery and records, safeguarding |
+| Care provider, in supported living | CQC registration, personal care, care records |
+| Managing agent | Whatever the management agreement says, often repairs, compliance checks, voids and rent collection |
+
+<Callout type="watch" title="Delegating the work is not delegating the duty">
+A landlord can ask an agent to arrange gas checks, but if a check is missed, the landlord is still in breach. Agents can also become liable in their own right as the person managing or in control of an HMO. Agreements should set out tasks, timescales, reporting and what happens when something is missed.
+</Callout>
+
+## For managing agents
+
+A management agreement in supported housing should cover at least:
+
+1. The properties covered and the services the agent provides.
+2. Compliance tasks, with timescales and who pays.
+3. How repairs are reported, prioritised and tracked, with response times.
+4. Void management, including how quickly rooms are made ready and who decides who moves in.
+5. Reporting to the landlord: what, how often and in what format.
+6. Access to properties and how residents' privacy and safety are protected.
+7. Data sharing, including what the agent may see about residents.
+8. What happens at the end of the agreement, including handover of records.
+
+<InArticleAd />
+
+## For proptech teams
+
+Supported housing has a different centre of gravity from general lettings. The questions that matter are about people and evidence, so the data model has to start there.
+
+### The data points that matter most
+
+| Data point | Who asks for it |
+| --- | --- |
+| Move-in date and needs assessment date | Licensing (assessment within four weeks), councils |
+| Support plan and review dates | Councils, commissioners, licensing |
+| Support sessions with time, duration and content | Councils testing more than minimal support |
+| Incidents and safeguarding referrals | Commissioners, licensing, CQC or Ofsted where relevant |
+| Rent and service charge breakdown by line | Council Housing Benefit teams, rent officers |
+| Certificates and expiry dates | Councils, HMO licensing, auditors |
+| Repairs with reported and completed dates | Residents, councils, Awaab's Law for registered providers |
+| Move-out date, reason and destination | Commissioners, strategy reviews |
+
+### Design principles
+
+- Time-stamp everything and keep an audit trail of edits. A record that can be changed silently is weak evidence.
+- Make the right thing easy. Session notes that take two minutes on a phone get written the same day.
+- Do not let templates write the notes. Pre-filled text that repeats across residents is a red flag in reviews.
+- Build exports that match how councils ask for evidence, per resident and per scheme.
+- Separate housing management time from support time in the data, so intensive housing management can be evidenced.
+
+### Data protection
+
+Support records often include health, offending history and other special category data under UK GDPR. You need a lawful basis and a condition for processing special category data, role-based access, encryption, retention rules and a data processing agreement between provider and supplier. The Information Commissioner's Office guidance on special category data is the place to start.
+
+### Sensors and smart building tools
+
+Damp and mould sensors, heating monitors and leak detection help registered providers meet Awaab's Law timescales. They only help if alerts reach someone who can act, and the action is recorded. A dashboard nobody checks creates evidence that a landlord knew about a hazard and did nothing.
+
+## Lease-based models
+
+Many managing agents work for investors who lease supported housing to registered providers. The Regulator of Social Housing has warned since 2019 about long, inflation-linked leases that concentrate risk on the provider. If you manage for an investor, understand the lease terms and the provider's financial position, because a provider in difficulty affects residents and the asset alike.

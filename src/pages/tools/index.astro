@@ -1,0 +1,105 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon, { type IconName } from '@/components/Icon.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import Faq from '@/components/Faq.astro';
+import { faqPage } from '@/lib/schema';
+import { href } from '@/lib/url';
+
+const tools: { title: string; href: string; icon: IconName; time: string; text: string; for: string }[] = [
+  {
+    title: 'Audit readiness check',
+    href: '/tools/audit-readiness/',
+    icon: 'clipboard',
+    time: 'About 10 minutes',
+    text: '24 questions across eight areas, from structure and support records to safeguarding, property and governance. You get a score for each area and your five priority actions.',
+    for: 'Support and housing providers',
+  },
+  {
+    title: 'Exempt accommodation checker',
+    href: '/tools/exempt-accommodation-checker/',
+    icon: 'compass',
+    time: 'About 3 minutes',
+    text: 'Answer up to six questions about a scheme to see which category of specified accommodation it is likely to fall into, what that means for rent and the evidence to keep.',
+    for: 'Anyone setting up or reviewing a scheme',
+  },
+  {
+    title: 'Service charge calculator',
+    href: '/tools/service-charge-calculator/',
+    icon: 'pound',
+    time: 'About 5 minutes',
+    text: 'Split a weekly charge into lines that are eligible, ineligible or depend on evidence, with annual totals and a CSV you can share.',
+    for: 'Housing providers and managing agents',
+  },
+];
+
+const faqs = [
+  {
+    q: 'Are the supported housing tools free?',
+    a: 'Yes. All three tools are free and run in your browser. You do not need an account, and nothing is sent anywhere unless you choose to send your readiness check results to SEA Audit.',
+  },
+  {
+    q: 'Is the exempt accommodation checker a legal decision?',
+    a: 'No. It shows the category a scheme is most likely to fall into based on your answers, with the reasons. The council decides each Housing Benefit claim on its own facts and evidence.',
+  },
+  {
+    q: 'What does the readiness check measure?',
+    a: 'It scores eight areas that councils and licensing look at: structure and eligibility, needs assessment and planning, support records, safeguarding, property, rent and service charges, governance and staffing, and resident voice and outcomes.',
+  },
+  {
+    q: 'Can I save my answers?',
+    a: 'Readiness check answers are saved in your browser as you go, so you can come back to them on the same device. You can also print the results or save them as a PDF.',
+  },
+];
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+---
+
+<Base
+  jsonLd={[faqPage(faqs, `${origin}${href('/tools/')}`)]}
+  title="Free supported housing tools"
+  description="Free tools for supported exempt accommodation: an audit readiness check, a category checker and a Housing Benefit service charge calculator."
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Tools', url: '/tools/' },
+  ]}
+>
+  <PageHero
+    eyebrow="Free tools"
+    title="Check where you stand"
+    lede="Each tool runs in your browser. Nothing is sent anywhere unless you choose to send it."
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'Tools', url: '/tools/' },
+    ]}
+  />
+  <div class="container">
+    <div class="grid gap-5 md:grid-cols-3">
+      {
+        tools.map((t, i) => (
+          <a href={href(t.href)} class="card card-link reveal flex flex-col p-7" style={`--i:${i}`}>
+            <span class="flex items-center justify-between">
+              <span class="icon-tile">
+                <Icon name={t.icon} size={22} />
+              </span>
+              <span class="chip chip-ink">{t.time}</span>
+            </span>
+            <span class="mt-6 font-display text-[1.45rem] font-semibold">{t.title}</span>
+            <span class="mt-2 text-[15px] leading-relaxed text-muted">{t.text}</span>
+            <span class="mt-4 text-[13.5px] font-medium text-teal">{t.for}</span>
+            <span class="mt-6 inline-flex items-center gap-2 font-semibold">
+              Open <Icon name="arrow-right" size={16} class="card-arrow" />
+            </span>
+          </a>
+        ))
+      }
+    </div>
+    <section class="mt-16 max-w-3xl" aria-labelledby="tools-faq">
+      <h2 id="tools-faq" class="text-[1.9rem]">About the tools</h2>
+      <div class="mt-4"><Faq items={faqs} /></div>
+    </section>
+    <div class="mt-16">
+      <AuditCta campaign="tools-index" />
+    </div>
+  </div>
+</Base>

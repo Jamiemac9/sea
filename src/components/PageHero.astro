@@ -1,0 +1,24 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  lede?: string;
+  crumbs?: { name: string; url: string }[];
+}
+const { eyebrow, title, lede, crumbs } = Astro.props;
+---
+
+<header class="hero pb-12 pt-8 md:pb-16 md:pt-12">
+  <div class="hero-grid"></div>
+  <div class="blob blob-a !opacity-50"></div>
+  <div class="blob blob-b !opacity-40"></div>
+  <div class="container">
+    {crumbs && <Breadcrumbs items={crumbs} />}
+    <p class="eyebrow reveal mt-6">{eyebrow}</p>
+    <h1 class="reveal mt-4 max-w-4xl text-[2.5rem] font-[680] leading-[1.02] tracking-[-0.035em] md:text-[4rem]" style="--i:1">{title}</h1>
+    {lede && <p class="lede reveal mt-5 max-w-3xl" style="--i:2">{lede}</p>}
+    <slot />
+  </div>
+</header>

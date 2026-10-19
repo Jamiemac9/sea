@@ -5,7 +5,8 @@ import Icon from '@/components/Icon.astro';
 import AdSlot from '@/components/AdSlot.astro';
 import AuditCta from '@/components/AuditCta.astro';
 import { timeline } from '@/data/timeline';
-import { href } from '@/lib/url';
+import { href, formatDate } from '@/lib/url';
+import keyFacts from '@/data/key-facts.json';
 
 const ld = {
   '@type': 'ItemList',
@@ -18,7 +19,7 @@ const ld = {
     description: m.text,
   })),
 };
-const lastChecked = '15 October 2026';
+const lastChecked = formatDate(new Date(keyFacts.lastChecked));
 ---
 
 <Base

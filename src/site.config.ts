@@ -7,7 +7,9 @@
 const env = import.meta.env;
 
 export const site = {
-  name: 'SEA Hub',
+  name: 'ExemptAccommodation.com',
+  // Used where the full domain name would be clumsy, such as running text.
+  shortName: 'Exempt Accommodation',
   legalName: 'SEA Audit',
   tagline: 'Plain-English guidance on supported exempt accommodation',
   description:
@@ -18,18 +20,28 @@ export const site = {
     name: 'SEA Audit',
     url: 'https://seaaudit.com',
   },
-  editorialTeam: 'The SEA Hub editorial team',
+  editorialTeam: 'The ExemptAccommodation.com editorial team',
   contactEmail: env.PUBLIC_CONTACT_EMAIL || 'hello@seaaudit.com',
   social: {
     linkedin: env.PUBLIC_LINKEDIN_URL || '',
   },
 };
 
+/**
+ * Page titles get the brand suffix only when the result still fits in the
+ * roughly 60 characters search results show. Search engines take the site
+ * name from WebSite structured data, so long titles lose nothing.
+ */
+export function brandTitle(title: string): string {
+  const full = `${title} | ${site.name}`;
+  return full.length <= 60 ? full : title;
+}
+
 /** Audit funnel. Every outbound link to SEA Audit goes through auditUrl(). */
 export const audit = {
   baseUrl: (env.PUBLIC_AUDIT_URL || 'https://seaaudit.com').replace(/\/$/, ''),
   bookPath: env.PUBLIC_AUDIT_BOOK_PATH || '/',
-  utmSource: 'sea-hub',
+  utmSource: 'exemptaccommodation',
   // Optional: POST endpoint that receives readiness-check results and enquiries
   // as JSON (a CRM webhook, Formspree, a SEA Audit API route). Leave empty to
   // hand results over by URL parameters instead.
@@ -78,7 +90,7 @@ export const analytics = {
 export const nav = [
   { label: 'Guides', href: '/guides/' },
   { label: 'Grey areas', href: '/guides/grey-areas-in-exempt-accommodation/' },
-  { label: 'Regulation tracker', href: '/regulation-tracker/' },
+  { label: 'Regulation tracker', short: 'Tracker', href: '/regulation-tracker/' },
   { label: 'Tools', href: '/tools/' },
   { label: 'Glossary', href: '/glossary/' },
   { label: 'Resources', href: '/resources/' },

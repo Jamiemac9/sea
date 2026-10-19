@@ -12,6 +12,7 @@ import AuditCta from '@/components/AuditCta.astro';
 import GuideCard from '@/components/GuideCard.astro';
 import { categories, audiences } from '@/content.config';
 import { href, formatDate, readingMinutes } from '@/lib/url';
+import { brandTitle } from '@/site.config';
 import { article, faqPage, howTo } from '@/lib/schema';
 
 export async function getStaticPaths() {
@@ -63,7 +64,7 @@ const components = { Callout, InArticleAd, table: TableEl };
 
 <Base
   title={d.title}
-  fullTitle={d.seoTitle ? `${d.seoTitle} | SEA Hub` : undefined}
+  fullTitle={d.seoTitle ? brandTitle(d.seoTitle) : undefined}
   description={d.description}
   ogType="article"
   jsonLd={ld}
@@ -119,7 +120,7 @@ const components = { Callout, InArticleAd, table: TableEl };
             {
               d.keyPoints.map((p) => (
                 <li class="flex gap-3 text-[15.5px] leading-relaxed text-ink-2">
-                  <span class="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-lime text-[#0b1f24]">
+                  <span class="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-gold text-[#102a46]">
                     <Icon name="check" size={12} stroke={3} />
                   </span>
                   <span>{p}</span>

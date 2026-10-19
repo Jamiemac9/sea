@@ -6,9 +6,8 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 // SITE_URL is the public origin used for canonicals, sitemaps and structured data.
-// Set it in the deployment environment. The default assumes the hub lives on a
-// seaaudit.com subdomain, which keeps the link equity inside the SEA Audit brand.
-const site = (process.env.SITE_URL || 'https://hub.seaaudit.com').replace(/\/$/, '');
+// Set it in the deployment environment (Cloudflare Pages > Settings > Variables).
+const site = (process.env.SITE_URL || 'https://exemptaccommodation.com').replace(/\/$/, '');
 const base = process.env.BASE_PATH || '/';
 const port = Number(process.env.PORT || 4321);
 

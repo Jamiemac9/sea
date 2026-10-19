@@ -1,22 +1,60 @@
 ---
+/**
+ * ExemptAccommodation.com logo, redrawn as SVG from the brand artwork:
+ * a house outline with a heart inside, in navy, teal and gold.
+ * Navy follows the theme (light navy in dark mode) so the mark stays visible.
+ *
+ * variant "full" is the mark plus wordmark, "mark" is the house on its own.
+ */
 interface Props {
-  size?: number;
+  variant?: 'full' | 'mark';
+  size?: 'sm' | 'md' | 'lg';
   class?: string;
 }
-const { size = 34, class: className } = Astro.props;
+const { variant = 'full', size = 'md', class: className } = Astro.props;
+const markH = { sm: 34, md: 44, lg: 56 }[size];
+const textSize = { sm: 'text-[14px]', md: 'text-[15px] sm:text-[16.5px]', lg: 'text-[19px]' }[size];
 ---
 
-<svg
-  width={size}
-  height={size}
-  viewBox="0 0 40 40"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
-  class={className}
-  aria-hidden="true"
->
-  <rect width="40" height="40" rx="12" fill="#0B1F24"></rect>
-  <path d="M10 19.5 20 11l10 8.5V29a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 10 29Z" stroke="#C9F2DF" stroke-width="2.4" stroke-linejoin="round"></path>
-  <path d="M15 30.5v-4.5a5 5 0 0 1 10 0v4.5" stroke="#3FD1AD" stroke-width="2.4" stroke-linecap="round"></path>
-  <circle cx="20" cy="20.5" r="2.6" fill="#D8F59A"></circle>
-</svg>
+<span class:list={['brand-logo inline-flex items-center gap-2.5', className]}>
+  <svg
+    viewBox="0 0 120 92"
+    height={markH}
+    width={Math.round((markH * 120) / 92)}
+    fill="none"
+    stroke-width="6.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    class="shrink-0"
+  >
+    <path d="M22 76 V45 H9 L58 6 L77 21" class="logo-navy"></path>
+    <path d="M77 21 V9.5 H90 V30" stroke="var(--brand-teal)"></path>
+    <path d="M90 30 L108 45 H95.5 V74 Q95.5 83 86.5 83 H65 C58 83 52.5 78.5 47.5 72" stroke="var(--brand-gold)"></path>
+    <path d="M47.5 72 C37 63 31.5 54 31.5 46 C31.5 37.5 37.5 32 44.5 32 C50.5 32 55.5 36.5 57 43" class="logo-navy"></path>
+    <path d="M57 43 C58.5 36.5 64 32 70.5 32 C77.5 32 83 37.5 83 45" stroke="var(--brand-gold)"></path>
+    <path d="M83 45 C83 58 70 69 57 77 C47 83 37 85.5 30 84.5 C25 83.8 22 80.5 22 76" stroke="var(--brand-teal)"></path>
+  </svg>
+  {
+    variant === 'full' && (
+      <span class:list={['brand-wordmark leading-[1.02]', textSize]}>
+        <span class="block font-[750] tracking-[-0.01em] text-[var(--brand-teal)]">Exempt</span>
+        <span class="block font-[750] tracking-[-0.015em] logo-navy-text">
+          Accommodation<span class="font-[450]">.com</span>
+        </span>
+      </span>
+    )
+  }
+</span>
+
+<style>
+  .brand-wordmark {
+    font-family: var(--font-brand);
+  }
+  .logo-navy {
+    stroke: var(--brand-navy);
+  }
+  .logo-navy-text {
+    color: var(--brand-navy);
+  }
+</style>

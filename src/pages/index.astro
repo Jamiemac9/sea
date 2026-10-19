@@ -11,7 +11,8 @@ import { audienceList } from '@/data/audiences';
 import { timeline } from '@/data/timeline';
 import { categories } from '@/content.config';
 import { site } from '@/site.config';
-import { href } from '@/lib/url';
+import { href, formatDate } from '@/lib/url';
+import keyFacts from '@/data/key-facts.json';
 import { faqPage } from '@/lib/schema';
 
 const guides = (await getCollection('guides')).sort((a, b) => a.data.order - b.data.order);
@@ -26,8 +27,9 @@ const topics: { key: keyof typeof categories; icon: IconName; href: string; span
   { key: 'practice', icon: 'clipboard', href: '/guides/#practice', span: 'md:col-span-2' },
 ];
 const countIn = (k: string) => guides.filter((g) => g.data.category === k).length;
-const shortLabel = (t: string) => {
-  const s = t.split(',')[0].replace(/^(The|A) /, '').replace(/\?$/, '');
+const shortLabel = (t: string, seo?: string) => {
+  const first = t.split(',')[0];
+  const s = (first.length >= 14 ? first : seo || t).replace(/^(The|A) /, '').replace(/\?$/, '');
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
@@ -78,7 +80,7 @@ const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
 
 <Base
   title={site.name}
-  fullTitle="SEA Hub: supported exempt accommodation guides and tools"
+  fullTitle="ExemptAccommodation.com: supported housing guides and tools"
   description="Plain-English guides, a regulation tracker and free tools for supported exempt accommodation, supported living, transitional and emergency housing in England."
   jsonLd={[faqPage(quick, `${origin}/`)]}
   showFooterAd={false}
@@ -234,7 +236,7 @@ const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
                     .filter((g) => g.data.category === t.key)
                     .slice(0, t.span ? 4 : 2)
                     .map((g) => (
-                      <span class="rounded-full bg-paper-2 px-2.5 py-1 text-[12.5px] font-medium text-ink-2">{shortLabel(g.data.title)}</span>
+                      <span class="rounded-full bg-paper-2 px-2.5 py-1 text-[12.5px] font-medium text-ink-2">{shortLabel(g.data.title, g.data.seoTitle)}</span>
                     ))}
                 </span>
               </span>
@@ -245,32 +247,37 @@ const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
     </div>
   </section>
 
-  <!-- Numbers -->
-  <section class="dark-band relative overflow-hidden py-20 md:py-24" aria-labelledby="numbers">
+  <!-- Key rules and dates. Stable facts with a last-checked date, kept in src/data/key-facts.json. -->
+  <section class="dark-band relative overflow-hidden py-20 md:py-24" aria-labelledby="key-rules">
     <div class="container">
-      <p class="eyebrow reveal">The sector in numbers</p>
-      <h2 id="numbers" class="h-section reveal mt-4 max-w-3xl" style="--i:1">Big, fast-growing and only now getting a regulator.</h2>
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="eyebrow reveal">Key rules and dates</p>
+          <h2 id="key-rules" class="h-section reveal mt-4 max-w-3xl" style="--i:1">The rules that matter right now.</h2>
+        </div>
+        <p class="reveal max-w-sm text-[14.5px] text-[#b9c8d8]" style="--i:2">
+          Last checked <time datetime={keyFacts.lastChecked}>{formatDate(new Date(keyFacts.lastChecked))}</time>. Each one links to the
+          guide we keep up to date as the rules change.
+        </p>
+      </div>
       <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="reveal border-t border-white/15 pt-6" style="--i:0">
-          <p class="stat-num text-lime"><span data-count="634000">634,000</span></p>
-          <p class="mt-3 text-[15px] text-[#b9cdc8]">units of supported housing across Great Britain</p>
-          <p class="mt-2 text-[12.5px] text-[#86a19b]">Supported Housing Review 2023, published Nov 2024</p>
-        </div>
-        <div class="reveal border-t border-white/15 pt-6" style="--i:1">
-          <p class="stat-num"><span data-count="215770">215,770</span></p>
-          <p class="mt-3 text-[15px] text-[#b9cdc8]">specified accommodation claims on the Housing Benefit system</p>
-          <p class="mt-2 text-[12.5px] text-[#86a19b]">Supported Housing Review 2023</p>
-        </div>
-        <div class="reveal border-t border-white/15 pt-6" style="--i:2">
-          <p class="stat-num"><span data-count="25000">25,000</span></p>
-          <p class="mt-3 text-[15px] text-[#b9cdc8]">people living in exempt accommodation in Birmingham</p>
-          <p class="mt-2 text-[12.5px] text-[#86a19b]">Birmingham council motion, January 2025</p>
-        </div>
-        <div class="reveal border-t border-white/15 pt-6" style="--i:3">
-          <p class="stat-num">£<span data-count="107">107</span>m</p>
-          <p class="mt-3 text-[15px] text-[#b9cdc8]">spent by London boroughs on exempt accommodation in one year</p>
-          <p class="mt-2 text-[12.5px] text-[#86a19b]">London Assembly Housing Committee, March 2023</p>
-        </div>
+        {
+          keyFacts.items.map((f, i) => (
+            <a href={href(f.href)} class="reveal group block border-t border-white/15 pt-6 no-underline" style={`--i:${i}`}>
+              <span
+                class:list={[
+                  'inline-block rounded-full px-2.5 py-0.5 text-[12px] font-semibold',
+                  f.status === 'In force' ? 'bg-white/10 text-[#e9eff6]' : 'bg-gold text-[#102a46]',
+                ]}
+              >
+                {f.status}
+              </span>
+              <p class:list={['stat-num mt-4 whitespace-nowrap', f.value.length > 7 && '!text-[clamp(2rem,3.4vw,2.9rem)]', i === 0 && 'text-gold']}>{f.value}</p>
+              <p class="mt-3 text-[15px] text-[#b9c8d8] group-hover:text-[#e9eff6]">{f.label}</p>
+              <p class="mt-2 text-[12.5px] text-[#8aa0b8]">{f.source}</p>
+            </a>
+          ))
+        }
       </div>
     </div>
   </section>

@@ -17,14 +17,13 @@ const isActive = (h: string) => h === activeHref;
   <div class="container flex h-[72px] items-center justify-between gap-4">
     <a href={href('/')} class="flex items-center gap-2.5 no-underline" aria-label={`${site.name} home`}>
       <Logo />
-      <span class="font-display text-[1.32rem] font-[680] tracking-tight">{site.name}</span>
     </a>
 
-    <nav aria-label="Main" class="hidden items-center gap-0.5 lg:flex">
+    <nav aria-label="Main" class="hidden items-center gap-0.5 xl:flex">
       {
         nav.map((item) => (
           <a href={href(item.href)} class="nav-link" aria-current={isActive(item.href) ? 'page' : undefined}>
-            {item.label}
+            {'short' in item ? item.short : item.label}
           </a>
         ))
       }
@@ -33,17 +32,17 @@ const isActive = (h: string) => h === activeHref;
     <div class="flex items-center gap-2">
       <button
         type="button"
-        class="hidden h-10 items-center gap-2 rounded-full border border-line bg-card px-3.5 text-[14px] text-muted transition hover:border-ink-2 hover:text-ink md:inline-flex"
+        class="hidden h-10 items-center gap-2 rounded-full border border-line bg-card px-3.5 text-[14px] text-muted transition hover:border-ink-2 hover:text-ink xl:inline-flex"
         data-search-open
         aria-label="Search the hub"
       >
         <Icon name="search" size={16} />
         <span>Search</span>
-        <kbd class="ml-2">Ctrl K</kbd>
+        <kbd class="ml-2 hidden 2xl:inline">Ctrl K</kbd>
       </button>
       <button
         type="button"
-        class="grid h-10 w-10 place-items-center rounded-full border border-line bg-card md:hidden"
+        class="grid h-10 w-10 place-items-center rounded-full border border-line bg-card xl:hidden"
         data-search-open
         aria-label="Search the hub"
       >
@@ -58,12 +57,12 @@ const isActive = (h: string) => h === activeHref;
         <Icon name="moon" size={17} class="theme-icon-moon" />
         <Icon name="sun" size={17} class="theme-icon-sun hidden" />
       </button>
-      <a href={href('/tools/audit-readiness/')} class="btn btn-primary btn-sm hidden sm:inline-flex">
+      <a href={href('/tools/audit-readiness/')} class="btn btn-primary btn-sm hidden whitespace-nowrap sm:inline-flex">
         Readiness check <Icon name="arrow-right" size={16} class="arrow" />
       </a>
       <button
         type="button"
-        class="grid h-10 w-10 place-items-center rounded-full bg-ink text-paper lg:hidden"
+        class="grid h-10 w-10 place-items-center rounded-full bg-ink text-paper xl:hidden"
         data-menu-open
         aria-expanded="false"
         aria-controls="mobile-nav"
@@ -75,7 +74,7 @@ const isActive = (h: string) => h === activeHref;
   </div>
 </header>
 
-<div id="mobile-nav" class="mobile-nav lg:hidden" data-mobile-nav data-open="false" aria-hidden="true">
+<div id="mobile-nav" class="mobile-nav xl:hidden" data-mobile-nav data-open="false" aria-hidden="true">
   <button
     type="button"
     class="absolute right-5 top-4 grid h-11 w-11 place-items-center rounded-full bg-ink text-paper"

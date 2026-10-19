@@ -5,6 +5,7 @@ import Icon from '@/components/Icon.astro';
 import AdSlot from '@/components/AdSlot.astro';
 import { glossary, glossaryBySlug, type Term } from '@/data/glossary';
 import { href } from '@/lib/url';
+import { brandTitle } from '@/site.config';
 import { sortedGuides } from '@/lib/content';
 
 export function getStaticPaths() {
@@ -50,8 +51,8 @@ const ld = [
   },
 ];
 const plain = term.term.replace(/ \(.*\)$/, '');
-const longTitle = `${plain}: definition | SEA Hub`;
-const pageTitle = longTitle.length <= 60 ? longTitle : `${plain} | SEA Hub`;
+const longTitle = brandTitle(`${plain}: definition`);
+const pageTitle = longTitle.includes(' | ') ? longTitle : brandTitle(plain);
 ---
 
 <Base

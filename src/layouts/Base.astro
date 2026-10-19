@@ -4,14 +4,14 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import SearchDialog from '@/components/SearchDialog.astro';
 import ConsentBanner from '@/components/ConsentBanner.astro';
-import { site, ads, analytics } from '@/site.config';
+import { site, ads, analytics, brandTitle } from '@/site.config';
 import { href } from '@/lib/url';
 import { graph, organization, website, breadcrumbs as crumbs } from '@/lib/schema';
 
 interface Props {
   title: string;
   description: string;
-  /** Full <title>. Defaults to "title | SEA Hub". */
+  /** Full <title>. Defaults to "title | site name" when that fits in 60 characters. */
   fullTitle?: string;
   ogType?: 'website' | 'article';
   jsonLd?: Record<string, unknown>[];
@@ -35,9 +35,9 @@ const {
   updated,
 } = Astro.props;
 
-const origin = (Astro.site?.toString() || 'https://hub.seaaudit.com/').replace(/\/$/, '');
+const origin = (Astro.site?.toString() || 'https://exemptaccommodation.com/').replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, origin + '/').toString();
-const pageTitle = fullTitle || `${title} | ${site.name}`;
+const pageTitle = fullTitle || brandTitle(title);
 const ogImage = `${origin}${href('/og-default.png')}`;
 const crumbItems = breadcrumbs?.map((b) => ({ name: b.name, url: new URL(href(b.url), origin + '/').toString() }));
 const ld = graph(organization(origin), website(origin), ...(crumbItems ? [crumbs(crumbItems)] : []), ...jsonLd);
@@ -57,8 +57,8 @@ const runtime = { adsClient: ads.client, consentMode: ads.consent, ga4: analytic
       name="robots"
       content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
     />
-    <meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#081619" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f7f6f2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a1626" media="(prefers-color-scheme: dark)" />
     <meta name="generator" content={Astro.generator} />
 
     <meta property="og:type" content={ogType} />

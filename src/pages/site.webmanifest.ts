@@ -10,8 +10,8 @@ export const GET: APIRoute = () =>
       description: site.tagline,
       start_url: href('/'),
       display: 'standalone',
-      background_color: '#f6f4ee',
-      theme_color: '#0b1f24',
+      background_color: '#f7f6f2',
+      theme_color: '#102a46',
       icons: [
         { src: href('/icon-192.png'), sizes: '192x192', type: 'image/png' },
         { src: href('/icon-512.png'), sizes: '512x512', type: 'image/png' },

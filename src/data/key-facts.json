@@ -1,0 +1,34 @@
+{
+  "lastChecked": "2026-10-19",
+  "reviewEveryDays": 60,
+  "items": [
+    {
+      "value": "4 weeks",
+      "label": "to complete each new resident's needs assessment under the planned licence conditions",
+      "status": "Planned",
+      "source": "Government response on supported housing regulation, April 2026",
+      "href": "/guides/support-planning-and-needs-assessments/"
+    },
+    {
+      "value": "2027",
+      "label": "when council licensing of supported exempt accommodation is expected to start",
+      "status": "Expected",
+      "source": "Government response, April 2026, updated June 2026",
+      "href": "/regulation-tracker/"
+    },
+    {
+      "value": "4",
+      "label": "categories of specified accommodation, where rent is paid through Housing Benefit",
+      "status": "In force",
+      "source": "Supported Accommodation Amendment Regulations 2014",
+      "href": "/guides/specified-accommodation-categories/"
+    },
+    {
+      "value": "1 May 2026",
+      "label": "section 21 ended for private assured tenancies, including supported housing outside registered providers",
+      "status": "In force",
+      "source": "Renters' Rights Act 2025",
+      "href": "/guides/renters-rights-act-supported-accommodation/"
+    }
+  ]
+}

@@ -107,6 +107,17 @@ for (const file of targets) {
   }
 }
 
+// Key facts on the home page and tracker carry a last-checked date. Warn when it goes stale.
+try {
+  const facts = JSON.parse(readFileSync(path.join(root, 'src/data/key-facts.json'), 'utf8'));
+  const age = Math.floor((Date.now() - new Date(facts.lastChecked).getTime()) / 86400000);
+  if (age > (facts.reviewEveryDays || 60)) {
+    findings.push({ file: 'src/data/key-facts.json', line: 2, id: 'stale-facts', level: 'warn', msg: `Key facts last checked ${age} days ago. Re-check each item against its source and update lastChecked.`, text: facts.lastChecked });
+  }
+} catch {
+  /* no facts file */
+}
+
 const errors = findings.filter((f) => f.level === 'error');
 const warns = findings.filter((f) => f.level === 'warn');
 for (const f of findings) console.log(`${f.level === 'error' ? 'ERROR' : 'warn '} ${f.file}:${f.line}  [${f.id}] ${f.msg}${f.text ? `  "${f.text}"` : ''}`);

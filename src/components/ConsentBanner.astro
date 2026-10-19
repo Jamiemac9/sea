@@ -1,4 +1,5 @@
 ---
+import { site } from '@/site.config';
 import { href } from '@/lib/url';
 import { ads } from '@/site.config';
 ---
@@ -8,7 +9,7 @@ import { ads } from '@/site.config';
     <div class="consent no-print" data-consent role="dialog" aria-modal="false" aria-labelledby="consent-title" hidden>
       <div class="card p-5 md:p-6">
         <p id="consent-title" class="font-display text-lg font-semibold">
-          Cookies on SEA Hub
+          Cookies on {site.name}
         </p>
         <p class="mt-2 text-[14.5px] text-ink-2">
           We use essential storage to remember your settings. With your permission we also use cookies for anonymous

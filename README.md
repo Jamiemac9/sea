@@ -1,4 +1,4 @@
-# SEA Hub
+# ExemptAccommodation.com
 
 A resource hub for supported exempt accommodation (SEA) and supported housing in England, published by SEA Audit. It is a static Astro site: every page is plain HTML at build time, so search engines and AI answer engines can read all of it without running JavaScript.
 
@@ -21,7 +21,7 @@ The build fails if the content linter finds a strong AI-writing tell or the SEO 
 1. In the Cloudflare dashboard, go to Workers & Pages, then Create, then Pages, then Connect to Git, and pick `Jamiemac9/sea`.
 2. Production branch: `main`.
 3. Framework preset: Astro. Build command: `npm run build`. Build output directory: `dist`.
-4. Under Environment variables, set `SITE_URL` to the live address, for example `https://hub.seaaudit.com`, plus any of the variables below you need. `.env.example` lists them all.
+4. Under Environment variables, set `SITE_URL` to the live address, for example `https://exemptaccommodation.com`, plus any of the variables below you need. `.env.example` lists them all.
 5. Deploy, then add your custom domain under the project's Custom domains tab.
 
 Every push to `main` deploys to production, and other branches get preview URLs. `.node-version` pins Node 22 for the build. `public/_headers` sets long caching for hashed assets and basic security headers. Cloudflare serves `dist/404.html` for missing pages.
@@ -30,11 +30,11 @@ To deploy from your own machine instead: `npm run build && npx wrangler pages de
 
 ## Configuration
 
-Everything brand-related lives in `src/site.config.ts`. Environment variables:
+Everything brand-related lives in `src/site.config.ts`. The logo is an SVG in `src/components/Logo.astro`, redrawn from the brand artwork, with navy that switches to a light tone in dark mode. Environment variables:
 
 | Variable | Purpose |
 | --- | --- |
-| `SITE_URL` | Public origin for canonicals, sitemap and structured data. Defaults to `https://hub.seaaudit.com`. Set it before launch. |
+| `SITE_URL` | Public origin for canonicals, sitemap and structured data. Defaults to `https://exemptaccommodation.com`. Set it before launch. |
 | `PUBLIC_ADSENSE_CLIENT` | AdSense publisher id, `ca-pub-...`. Without it every slot shows a SEA Audit house ad. |
 | `PUBLIC_ADSENSE_SLOT_LEADERBOARD`, `_IN_ARTICLE`, `_SIDEBAR`, `_FOOTER` | AdSense ad unit ids per placement. |
 | `PUBLIC_CONSENT_MODE` | `builtin` (default, the hub's own banner plus Google Consent Mode v2) or `external` (a Google-certified CMP shows the message). |
@@ -50,6 +50,12 @@ Everything brand-related lives in `src/site.config.ts`. Environment variables:
 - A regulation tracker (`src/data/timeline.ts`), FAQ (`src/data/faqs.ts`), resources directory (`src/data/resources.ts`) and four audience hubs at `/for/...` (`src/data/audiences.ts`).
 - Three tools: the audit readiness check (`src/data/readiness.ts`), the exempt accommodation checker and the service charge calculator.
 - About, advertise, privacy and cookie pages.
+
+## Keeping the key facts current
+
+The "Key rules and dates" band on the home page and the "last checked" dates on the regulation tracker and `llms.txt` come from `src/data/key-facts.json`. It holds rules and dates, not statistics, because statistics go out of date fast.
+
+Every couple of months, re-check each item against its source and update `lastChecked`. If it is older than `reviewEveryDays` (60 by default), `npm run build` prints a warning.
 
 ## Adding or updating a guide
 

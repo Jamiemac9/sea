@@ -4,6 +4,7 @@ import { glossary } from '@/data/glossary';
 import { categories } from '@/content.config';
 import { site } from '@/site.config';
 import { href } from '@/lib/url';
+import keyFacts from '@/data/key-facts.json';
 
 /** llms.txt (llmstxt.org): a short map of the site for language models and answer engines. */
 export const GET: APIRoute = async ({ site: siteUrl }) => {
@@ -15,7 +16,7 @@ export const GET: APIRoute = async ({ site: siteUrl }) => {
     '',
     `> ${site.name} is a plain-English resource hub on supported exempt accommodation (SEA) and supported housing in England, published by ${site.publisher.name}. It covers exempt and specified accommodation, Housing Benefit rent and service charges, supported living, transitional, emergency and care leaver accommodation, licensing under the Supported Housing (Regulatory Oversight) Act 2023, and best practice.`,
     '',
-    'Each guide starts with a quick answer and a short version of no more than five points, and lists its sources. Guidance covers England and is general information, not legal advice. Last reviewed October 2026.',
+    `Each guide starts with a quick answer and a short version of no more than five points, and lists its sources. Guidance covers England and is general information, not legal advice. Key facts last checked ${keyFacts.lastChecked}.`,
     '',
   ];
   for (const key of Object.keys(categories) as (keyof typeof categories)[]) {

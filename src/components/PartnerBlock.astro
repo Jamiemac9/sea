@@ -5,8 +5,8 @@
  * unlabelled or without rel="sponsored".
  */
 import Icon from './Icon.astro';
-import { partners, partnerLabels, partnerRel } from '@/data/partners';
-import { audit } from '@/site.config';
+import { partners, partnerLabels, partnerRel, partnerLink } from '@/data/partners';
+import { audit, affiliates } from '@/site.config';
 import { href } from '@/lib/url';
 
 interface Props {
@@ -18,8 +18,8 @@ const p = partners[id];
 if (!p) throw new Error(`Unknown partner: ${id}`);
 
 // Our own tags go on sister links only. Affiliate and sponsor links are the
-// partner's tracking links and must be used exactly as given.
-const url = new URL(p.url);
+// partner's tracking links (or an Awin link built from the advertiser id).
+const url = new URL(partnerLink(p, placement, affiliates.awinPublisherId));
 if (p.kind === 'sister') {
   url.searchParams.set('utm_source', audit.utmSource);
   url.searchParams.set('utm_medium', 'referral');

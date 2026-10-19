@@ -103,6 +103,14 @@ export const ads = {
 
 export type AdSlotName = keyof typeof ads.slots;
 
+/**
+ * Affiliate networks. The Awin publisher id goes into every Awin link built by
+ * PartnerBlock, so a partner entry only needs the advertiser's id.
+ */
+export const affiliates = {
+  awinPublisherId: env.PUBLIC_AWIN_PUBLISHER_ID || '3128025',
+};
+
 /** Optional analytics. GA4 only loads after analytics consent. */
 export const analytics = {
   ga4: env.PUBLIC_GA4_ID || '',

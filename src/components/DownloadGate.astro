@@ -1,0 +1,103 @@
+---
+/**
+ * Soft email gate for a free template. The visitor gives a name, email and
+ * role, and can opt in to regulation alerts and SEA Audit contact (both
+ * unticked). The file is revealed whether or not the sign-up succeeds, and
+ * returning visitors on the same browser skip the form.
+ */
+import Icon from './Icon.astro';
+import { forms, site } from '@/site.config';
+import { href } from '@/lib/url';
+import type { Template } from '@/data/templates';
+
+interface Props {
+  template: Template;
+  size?: string;
+}
+const { template: t, size } = Astro.props;
+const file = href(t.file);
+const fileName = t.file.split('/').pop();
+const id = `gate-${t.slug}`;
+---
+
+<div class="gate card overflow-hidden" id="download" data-gate data-slug={t.slug}>
+  <div class="gate-top px-6 pb-5 pt-6 md:px-7">
+    <div class="flex items-center gap-3">
+      <span class:list={['file-badge', t.format === 'Excel' ? 'file-badge-xl' : 'file-badge-doc']} aria-hidden="true">
+        {t.format === 'Excel' ? 'XLSX' : 'DOCX'}
+      </span>
+      <div>
+        <p class="font-display text-[1.15rem] font-semibold leading-tight">Free {t.format} template</p>
+        <p class="text-[13.5px] text-muted">{[t.pages, size].filter(Boolean).join(', ')}</p>
+      </div>
+    </div>
+  </div>
+
+  <form class="space-y-3 px-6 pb-6 md:px-7" data-gate-form aria-labelledby={`${id}-title`}>
+    <p id={`${id}-title`} class="text-[14.5px] text-ink-2">
+      Tell us where to send updates to this template and we will start your download.
+    </p>
+    <label class="block">
+      <span class="text-[14px] font-medium">Your name</span>
+      <input class="field mt-1" name="name" autocomplete="name" required maxlength="100" />
+    </label>
+    <label class="block">
+      <span class="text-[14px] font-medium">Work email</span>
+      <input class="field mt-1" type="email" name="email" autocomplete="email" required maxlength="200" />
+    </label>
+    <label class="block">
+      <span class="text-[14px] font-medium">What best describes you?</span>
+      <select class="field mt-1" name="role" required>
+        <option value="">Choose one</option>
+        {forms.roles.map((r) => <option>{r}</option>)}
+      </select>
+    </label>
+    <div class="hp" aria-hidden="true">
+      <label>Leave this empty <input name="website" tabindex="-1" autocomplete="off" /></label>
+    </div>
+    <label class="flex items-start gap-3 pt-1 text-[14px] text-ink-2">
+      <input type="checkbox" name="alerts" class="mt-1 h-4 w-4 shrink-0 accent-[var(--teal)]" />
+      <span>Email me when supported housing rules change. About once a month.</span>
+    </label>
+    <label class="flex items-start gap-3 text-[14px] text-ink-2">
+      <input type="checkbox" name="audit" class="mt-1 h-4 w-4 shrink-0 accent-[var(--teal)]" />
+      <span>SEA Audit can contact me about an audit of our service.</span>
+    </label>
+    <button type="submit" class="btn btn-primary mt-2 w-full">
+      Download the template <Icon name="arrow-right" size={16} class="arrow" />
+    </button>
+    <p class="text-[12.5px] leading-relaxed text-muted">
+      Free, with no account. We never sell your details and you can unsubscribe from any email. See the <a
+        href={href('/privacy/')}
+        class="underline underline-offset-2">privacy notice</a
+      >.
+    </p>
+  </form>
+
+  <div class="space-y-4 px-6 pb-6 md:px-7" data-gate-done hidden role="status">
+    <p class="flex items-center gap-2 font-semibold text-teal">
+      <Icon name="check" size={18} stroke={2.6} /> Your template is ready
+    </p>
+    <a href={file} download={fileName} class="btn btn-primary w-full" data-gate-link>
+      Download {fileName} <Icon name="arrow-right" size={16} class="arrow" />
+    </a>
+    <p class="text-[13.5px] text-muted">
+      Saved for <span class="font-medium text-ink" data-gate-who></span>. <button
+        type="button"
+        class="underline underline-offset-2 hover:text-ink"
+        data-gate-reset>Not you?</button
+      >
+    </p>
+    <p class="text-[13.5px] text-muted">
+      Questions about the template? Email <a href={`mailto:${site.contactEmail}`} class="underline underline-offset-2"
+        >{site.contactEmail}</a
+      >.
+    </p>
+  </div>
+
+  <noscript>
+    <p class="px-6 pb-6 text-[14px] md:px-7">
+      <a href={file} class="font-semibold text-teal underline">Download {fileName}</a>
+    </p>
+  </noscript>
+</div>

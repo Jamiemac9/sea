@@ -194,6 +194,14 @@ export const resources: Resource[] = [
     why: 'Regulatory judgements, standards and its work on lease-based supported housing.',
   },
   {
+    title: 'HMO Profit',
+    url: 'https://hmoprofit.co.uk',
+    publisher: 'Our sister site',
+    type: 'Tool',
+    topics: ['Rent', 'Property'],
+    why: 'A calculator for HMOs and supported accommodation, run by the same team as this site. Model rent, costs, voids and occupancy on a property.',
+  },
+  {
     title: 'OpenSEO',
     url: 'https://github.com/every-app/open-seo',
     publisher: 'every-app',

@@ -4,6 +4,7 @@ import PageHero from '@/components/PageHero.astro';
 import Icon from '@/components/Icon.astro';
 import AdSlot from '@/components/AdSlot.astro';
 import AuditCta from '@/components/AuditCta.astro';
+import AlertsSignup from '@/components/AlertsSignup.astro';
 import { timeline } from '@/data/timeline';
 import { href, formatDate } from '@/lib/url';
 import keyFacts from '@/data/key-facts.json';
@@ -93,6 +94,15 @@ const lastChecked = formatDate(new Date(keyFacts.lastChecked));
   </div>
 
   <div class="container mt-16">
+    <AlertsSignup
+      variant="band"
+      placement="tracker"
+      title="Get an email when this page changes"
+      text="We check this timeline against government publications. When a date moves or something new is published, you get one short email with what changed and what to do."
+    />
+  </div>
+
+  <div class="container mt-10">
     <AuditCta campaign="tracker" title="Be ready before your council's licensing scheme opens" />
   </div>
 </Base>

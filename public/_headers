@@ -17,3 +17,8 @@
 
 /llms-full.txt
   Content-Type: text/plain; charset=utf-8
+
+# Template files: the landing pages under /templates/ should rank, not the raw files.
+/downloads/*
+  X-Robots-Tag: noindex
+  Cache-Control: public, max-age=3600

@@ -10,6 +10,10 @@ import AdSlot from '@/components/AdSlot.astro';
 import InArticleAd from '@/components/InArticleAd.astro';
 import AuditCta from '@/components/AuditCta.astro';
 import GuideCard from '@/components/GuideCard.astro';
+import AlertsSignup from '@/components/AlertsSignup.astro';
+import PartnerBlock from '@/components/PartnerBlock.astro';
+import { partnersFor } from '@/data/partners';
+import { templates } from '@/data/templates';
 import { categories, audiences } from '@/content.config';
 import { href, formatDate, readingMinutes } from '@/lib/url';
 import { brandTitle } from '@/site.config';
@@ -60,6 +64,8 @@ const ld = [
 ];
 
 const components = { Callout, InArticleAd, table: TableEl };
+const guidePartners = partnersFor({ guide: guide.id });
+const guideTemplates = templates.filter((t) => t.guide.href === `/guides/${guide.id}/`);
 ---
 
 <Base
@@ -161,6 +167,37 @@ const components = { Callout, InArticleAd, table: TableEl };
           </a>
         </section>
 
+        {guidePartners.map(([id]) => (
+          <div class="mt-6">
+            <PartnerBlock id={id} placement={`guide-${guide.id}`} />
+          </div>
+        ))}
+
+        {
+          guideTemplates.length > 0 && (
+            <section class="mt-12" aria-labelledby="guide-templates">
+              <p id="guide-templates" class="eyebrow">
+                Free {guideTemplates.length > 1 ? 'templates' : 'template'} for this guide
+              </p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                {guideTemplates.map((t) => (
+                  <a href={href(`/templates/${t.slug}/`)} class="card card-link flex items-start gap-4 p-5">
+                    <span class:list={['file-badge', t.format === 'Excel' ? 'file-badge-xl' : 'file-badge-doc']} aria-hidden="true">
+                      {t.format === 'Excel' ? 'XLSX' : 'DOCX'}
+                    </span>
+                    <span>
+                      <span class="block font-display text-[1.08rem] font-semibold leading-snug">{t.title}</span>
+                      <span class="mt-1 block text-[14px] text-muted">
+                        {t.format}, {t.pages}. Free download.
+                      </span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )
+        }
+
         {
           d.faqs.length > 0 && (
             <section class="mt-16" aria-labelledby="faqs">
@@ -204,6 +241,14 @@ const components = { Callout, InArticleAd, table: TableEl };
                 ))}
               </ol>
             </section>
+          )
+        }
+
+        {
+          d.category === 'regulation' && (
+            <div class="mt-16">
+              <AlertsSignup placement={`guide-${guide.id}`} title="Get alerts when this changes" />
+            </div>
           )
         }
 

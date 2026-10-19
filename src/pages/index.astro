@@ -7,6 +7,8 @@ import GuideCard from '@/components/GuideCard.astro';
 import Faq from '@/components/Faq.astro';
 import AdSlot from '@/components/AdSlot.astro';
 import AuditCta from '@/components/AuditCta.astro';
+import AlertsSignup from '@/components/AlertsSignup.astro';
+import { templates } from '@/data/templates';
 import { audienceList } from '@/data/audiences';
 import { timeline } from '@/data/timeline';
 import { categories } from '@/content.config';
@@ -324,6 +326,14 @@ const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
         ))
       }
     </ol>
+    <div class="reveal mt-10">
+      <AlertsSignup
+        variant="band"
+        placement="home-tracker"
+        title="Hear about the next change first"
+        text="Draft licensing regulations are due later in 2026. Get one short email when they are published, and when any other date on this timeline moves."
+      />
+    </div>
   </section>
 
   <!-- Tools -->
@@ -351,6 +361,33 @@ const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
           <span class="mt-6 inline-flex items-center gap-2 font-semibold text-teal">Open the calculator <Icon name="arrow-right" size={16} class="card-arrow" /></span>
         </a>
       </div>
+    </div>
+  </section>
+
+  <!-- Templates -->
+  <section class="container py-20 md:py-28" aria-labelledby="templates">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <p class="eyebrow reveal">Free templates</p>
+        <h2 id="templates" class="h-section reveal mt-4 max-w-3xl" style="--i:1">Plans, assessments and schedules, ready to fill in.</h2>
+      </div>
+      <a href={href('/templates/')} class="btn btn-ghost reveal">All templates <Icon name="arrow-right" size={16} class="arrow" /></a>
+    </div>
+    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        templates.map((t, i) => (
+          <a href={href(`/templates/${t.slug}/`)} class="card card-link reveal flex flex-col p-6" style={`--i:${i}`}>
+            <span class:list={['file-badge', t.format === 'Excel' ? 'file-badge-xl' : 'file-badge-doc']} aria-hidden="true">
+              {t.format === 'Excel' ? 'XLSX' : 'DOCX'}
+            </span>
+            <span class="mt-5 font-display text-[1.2rem] font-semibold leading-snug">{t.title}</span>
+            <span class="mt-2 text-[14px] text-muted">{t.format}, {t.pages}</span>
+            <span class="mt-auto inline-flex items-center gap-2 pt-5 font-semibold text-teal">
+              Get it free <Icon name="arrow-right" size={16} class="card-arrow" />
+            </span>
+          </a>
+        ))
+      }
     </div>
   </section>
 

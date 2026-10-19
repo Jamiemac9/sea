@@ -3,6 +3,7 @@ import Base from '@/layouts/Base.astro';
 import PageHero from '@/components/PageHero.astro';
 import Icon from '@/components/Icon.astro';
 import { site } from '@/site.config';
+import { href } from '@/lib/url';
 
 const placements = [
   { name: 'Leaderboard', where: 'Home page, guide index and the end of every guide', size: 'Responsive, 728x90 and 970x90 on desktop, 320x100 on mobile' },
@@ -36,7 +37,7 @@ const audience = [
       { name: 'Advertise', url: '/advertise/' },
     ]}
   >
-    <a href={`mailto:${site.contactEmail}?subject=Advertising%20on%20SEA%20Hub`} class="btn btn-primary reveal mt-8" style="--i:3">
+    <a href={`mailto:${site.contactEmail}?subject=Advertising%20on%20ExemptAccommodation.com`} class="btn btn-primary reveal mt-8" style="--i:3">
       Ask for the media pack <Icon name="mail" size={16} />
     </a>
   </PageHero>
@@ -102,6 +103,13 @@ const audience = [
         featured resource card or a section of the regulation tracker. Sponsored content is marked as sponsored and links use the
         sponsored attribute, so search engines know it is paid. We decide what is published, and we turn down anything that would
         mislead readers about the rules.
+      </p>
+      <h2>Affiliate partnerships</h2>
+      <p>
+        We work with a small number of affiliate partners whose products help readers act on a guide, such as compliance
+        certificates, landlord insurance, training and housing software. Affiliate links are labelled on the page, carry the sponsored
+        attribute and are covered by our <a href={href('/about/#how-we-make-money')}>how we make money</a> statement. If you run an
+        affiliate programme for the sector, email us with the commission terms and who the product is for.
       </p>
     </section>
   </div>

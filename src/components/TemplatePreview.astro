@@ -1,0 +1,101 @@
+---
+/**
+ * A drawn preview of a template file: a stack of pages for Word, a sheet
+ * with column headers and tabs for Excel. Built from the same data as the
+ * page, so it never goes out of step with the description.
+ */
+import type { Template } from '@/data/templates';
+
+interface Props {
+  template: Template;
+}
+const { template: t } = Astro.props;
+const isExcel = t.format === 'Excel';
+const [columns, tabs, ...rest] = t.preview;
+const rows = 6;
+---
+
+{
+  isExcel ? (
+    <figure class="sheet-preview" aria-label={`Preview of the ${t.title} spreadsheet`}>
+      <div class="sheet-bar">
+        <span class="file-badge file-badge-xl !h-6 !w-auto !px-2 !text-[10px]">XLSX</span>
+        <span class="truncate text-[13px] font-medium">{t.file.split('/').pop()}</span>
+      </div>
+      <div class="sheet-scroll">
+        <table class="sheet-grid">
+          <thead>
+            <tr>
+              <th class="sheet-corner" />
+              {columns.items.map((_, i) => (
+                <th class="sheet-letter">{String.fromCharCode(65 + i)}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="sheet-head">
+              <th class="sheet-num">1</th>
+              {columns.items.map((c) => (
+                <td>{c}</td>
+              ))}
+            </tr>
+            {Array.from({ length: rows }, (_, r) => (
+              <tr>
+                <th class="sheet-num">{r + 2}</th>
+                {columns.items.map((_, c) => (
+                  <td>
+                    <span class="sheet-fill" style={`--w:${30 + ((r * 7 + c * 13) % 55)}%`} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {tabs && (
+        <div class="sheet-tabs" role="list">
+          {tabs.items.map((tab, i) => (
+            <span role="listitem" class:list={['sheet-tab', i === 1 && 'is-active']}>
+              {tab}
+            </span>
+          ))}
+        </div>
+      )}
+      {rest.map((g) => (
+        <figcaption class="border-t border-line px-5 py-4">
+          <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">{g.heading}</p>
+          <ul class="mt-2 flex flex-wrap gap-2">
+            {g.items.map((item) => (
+              <li class="chip !text-[13px]">{item}</li>
+            ))}
+          </ul>
+        </figcaption>
+      ))}
+    </figure>
+  ) : (
+    <figure class="doc-preview" aria-label={`Preview of the ${t.title}`}>
+      <div class="doc-page doc-page-back" aria-hidden="true" />
+      <div class="doc-page doc-page-mid" aria-hidden="true" />
+      <div class="doc-page">
+        <div class="doc-head">
+          <span>ExemptAccommodation.com</span>
+          <span>{t.title.replace(/ for supported housing$/, '')}</span>
+        </div>
+        <p class="doc-title">{t.title.replace(/ for supported housing$/, '')}</p>
+        {t.preview.map((g) => (
+          <div class="mt-5">
+            <p class="doc-h2">{g.heading}</p>
+            <ul class="doc-fields">
+              {g.items.map((item) => (
+                <li>
+                  <span class="doc-label">{item}</span>
+                  <span class="doc-line" />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </figure>
+  )
+}

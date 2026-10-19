@@ -160,8 +160,10 @@ for (const [d, urls] of descs) if (d && urls.length > 1) urls.forEach((u) => add
 
 // Orphans: pages with no links from any other page's main content, nav and footer excluded.
 const navLinked = new Set(pages.flatMap((p) => p.links.filter((l) => l.startsWith('/')).map((l) => l.split('#')[0])));
+// Noindex pages (a sign-up confirmation, for example) are reached from outside the site, so they are skipped.
+const noindexUrls = new Set(pages.filter((p) => /noindex/i.test(p.robots)).map((p) => p.url));
 for (const [url, n] of inbound) {
-  if (url === '/' || url === '/404.html' || url.endsWith('404/')) continue;
+  if (url === '/' || url === '/404.html' || url.endsWith('404/') || noindexUrls.has(url)) continue;
   if (n === 0 && !navLinked.has(url)) add('orphan-page', url);
 }
 

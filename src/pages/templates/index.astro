@@ -1,0 +1,108 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import Faq from '@/components/Faq.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import AlertsSignup from '@/components/AlertsSignup.astro';
+import { templates } from '@/data/templates';
+import { faqPage } from '@/lib/schema';
+import { href } from '@/lib/url';
+
+const faqs = [
+  {
+    q: 'Are the supported housing templates free?',
+    a: 'Yes. Every template is free to download, use and change. We ask for your name, email and role so we can tell you when a template is updated.',
+  },
+  {
+    q: 'Can I add my own logo and change the wording?',
+    a: 'Yes. The Word templates are normal documents and the spreadsheets are normal Excel files. Add your logo, rename sections and adapt them to your service.',
+  },
+  {
+    q: 'Will these templates meet the new licensing rules?',
+    a: 'They are built on what councils test in Housing Benefit reviews and what the April 2026 government response says licensing will test. The final regulations are still to come, so check back for updated versions.',
+  },
+  {
+    q: 'Do the templates work in Google Docs and Google Sheets?',
+    a: 'Yes. Upload them to Google Drive and open them with Google Docs or Google Sheets. Formulas and drop-down lists carry over.',
+  },
+];
+
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const url = `${origin}${href('/templates/')}`;
+const ld = [
+  {
+    '@type': 'ItemList',
+    name: 'Free supported housing templates',
+    itemListElement: templates.map((t, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: t.title,
+      url: `${origin}${href(`/templates/${t.slug}/`)}`,
+    })),
+  },
+  faqPage(faqs, url),
+];
+---
+
+<Base
+  title="Free supported housing templates"
+  description="Free Word and Excel templates for supported housing: a support plan, a needs assessment, a rent and service charge schedule and a licensing readiness checklist."
+  jsonLd={ld}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Templates', url: '/templates/' },
+  ]}
+>
+  <PageHero
+    eyebrow="Free templates"
+    title="Templates you can use tomorrow"
+    lede="Word and Excel files built around what councils and the planned licensing conditions look for. Add your logo and start filling them in."
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'Templates', url: '/templates/' },
+    ]}
+  />
+  <div class="container">
+    <div class="grid gap-5 md:grid-cols-2">
+      {
+        templates.map((t, i) => (
+          <a href={href(`/templates/${t.slug}/`)} class="card card-link reveal flex flex-col p-7" style={`--i:${i}`}>
+            <span class="flex items-start justify-between gap-4">
+              <span class:list={['file-badge', t.format === 'Excel' ? 'file-badge-xl' : 'file-badge-doc']} aria-hidden="true">
+                {t.format === 'Excel' ? 'XLSX' : 'DOCX'}
+              </span>
+              <span class="chip chip-ink">
+                {t.format}, {t.pages}
+              </span>
+            </span>
+            <span class="mt-6 font-display text-[1.45rem] font-semibold leading-snug">{t.title}</span>
+            <span class="mt-2 text-[15px] leading-relaxed text-muted">{t.description}</span>
+            <span class="mt-4 text-[13.5px] font-medium text-teal">{t.forAudience}</span>
+            <span class="mt-6 inline-flex items-center gap-2 font-semibold">
+              Get the template <Icon name="arrow-right" size={16} class="card-arrow" />
+            </span>
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="mt-16">
+      <AlertsSignup
+        variant="band"
+        placement="templates-index"
+        title="Know when the templates change"
+        text="Licensing regulations are due to be consulted on later in 2026. When they land we will update these templates and send one short email with what changed."
+      />
+    </div>
+
+    <section class="mt-16 max-w-3xl" aria-labelledby="templates-faq">
+      <h2 id="templates-faq" class="text-[1.9rem]">About the templates</h2>
+      <div class="mt-4"><Faq items={faqs} /></div>
+    </section>
+
+    <div class="mt-16">
+      <AuditCta campaign="templates-index" />
+    </div>
+  </div>
+</Base>

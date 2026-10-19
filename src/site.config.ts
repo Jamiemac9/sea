@@ -48,6 +48,23 @@ export const audit = {
   leadEndpoint: env.PUBLIC_LEAD_ENDPOINT || '',
 };
 
+/**
+ * Email sign-ups: template downloads and regulation alerts. The default is the
+ * Cloudflare Pages Function in functions/api/subscribe.ts, which passes each
+ * sign-up to Brevo or MailerLite and, optionally, a webhook.
+ */
+export const forms = {
+  endpoint: env.PUBLIC_SUBSCRIBE_ENDPOINT || '/api/subscribe',
+  roles: [
+    'Support provider',
+    'Housing provider or landlord',
+    'Managing agent',
+    'Proptech or software',
+    'Council or commissioner',
+    'Other',
+  ],
+};
+
 export function auditUrl(campaign: string, content?: string, path = audit.bookPath) {
   const url = new URL(path, audit.baseUrl + '/');
   url.searchParams.set('utm_source', audit.utmSource);
@@ -87,11 +104,14 @@ export const analytics = {
   ga4: env.PUBLIC_GA4_ID || '',
 };
 
+// desktop: false keeps an item in the mobile menu and footer only, so the
+// desktop bar stays on one line.
 export const nav = [
   { label: 'Guides', href: '/guides/' },
   { label: 'Grey areas', href: '/guides/grey-areas-in-exempt-accommodation/' },
   { label: 'Regulation tracker', short: 'Tracker', href: '/regulation-tracker/' },
+  { label: 'Templates', href: '/templates/' },
   { label: 'Tools', href: '/tools/' },
   { label: 'Glossary', href: '/glossary/' },
-  { label: 'Resources', href: '/resources/' },
+  { label: 'Resources', href: '/resources/', desktop: false },
 ];

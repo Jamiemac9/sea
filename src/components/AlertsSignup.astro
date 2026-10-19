@@ -1,0 +1,101 @@
+---
+/**
+ * Regulation alerts sign-up. One email when supported housing rules or dates
+ * change, so the page a visitor found us on can keep them up to date.
+ *
+ * variant "band" is a full-width dark panel, "card" sits in a sidebar or at the
+ * end of a guide, "footer" is the compact form in the site footer.
+ */
+import Icon from './Icon.astro';
+import { forms, site } from '@/site.config';
+import { href } from '@/lib/url';
+
+interface Props {
+  variant?: 'band' | 'card' | 'footer';
+  title?: string;
+  text?: string;
+  placement: string;
+}
+const {
+  variant = 'card',
+  title = 'Get regulation alerts',
+  text = 'One short email when licensing, Housing Benefit or national standards change, with what it means for your service. About once a month.',
+  placement,
+} = Astro.props;
+const dark = variant === 'band';
+const uid = `alerts-${placement}`;
+const muted = dark ? 'text-[#b9c8d8]' : 'text-muted';
+---
+
+{
+  variant === 'footer' ? (
+    <form class="alerts-form mt-6 max-w-sm" data-alerts-form data-placement={placement} data-contact={site.contactEmail}>
+      <label for={`${uid}-email`} class="font-display text-[15px] font-semibold">
+        {title}
+      </label>
+      <p class="mt-1 text-[13.5px] text-muted">When the rules change, about once a month.</p>
+      <div class="alerts-fields mt-3 flex gap-2">
+        <input id={`${uid}-email`} class="field !min-h-[42px] !py-2" type="email" name="email" autocomplete="email" placeholder="Work email" required maxlength="200" />
+        <button type="submit" class="btn btn-dark btn-sm shrink-0">Sign up</button>
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label>Leave this empty <input name="website" tabindex="-1" autocomplete="off" /></label>
+      </div>
+      <p class="mt-2 text-[13px] text-muted" data-alerts-status role="status" aria-live="polite" />
+    </form>
+  ) : (
+    <section
+      class:list={[
+        'not-prose relative overflow-hidden',
+        dark ? 'dark-band rounded-[28px] p-7 md:p-10' : 'card p-6 md:p-8',
+      ]}
+      aria-labelledby={`${uid}-title`}
+    >
+      <div class:list={['grid gap-6', dark && 'lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-10']}>
+        <div>
+          <p class="eyebrow inline-flex items-center gap-2">
+            <Icon name="mail" size={15} /> Regulation alerts
+          </p>
+          <h2 id={`${uid}-title`} class:list={['mt-3 font-display font-semibold leading-tight', dark ? 'text-[1.7rem] md:text-[2.1rem]' : 'text-[1.45rem]']}>
+            {title}
+          </h2>
+          <p class:list={['mt-2 max-w-xl text-[15.5px]', muted]}>{text}</p>
+        </div>
+        <form class="alerts-form" data-alerts-form data-placement={placement} data-contact={site.contactEmail}>
+          <div class="alerts-fields grid gap-3 sm:grid-cols-2">
+            <label class="block">
+              <span class:list={['text-[14px]', muted]}>Work email</span>
+              <input class="field mt-1" type="email" name="email" autocomplete="email" required maxlength="200" />
+            </label>
+            <label class="block">
+              <span class:list={['text-[14px]', muted]}>What best describes you? (optional)</span>
+              <select class="field mt-1" name="role">
+                <option value="">Choose one</option>
+                {forms.roles.map((r) => (
+                  <option>{r}</option>
+                ))}
+              </select>
+            </label>
+            <div class="hp" aria-hidden="true">
+              <label>
+                Leave this empty <input name="website" tabindex="-1" autocomplete="off" />
+              </label>
+            </div>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 sm:col-span-2">
+              <button type="submit" class:list={['btn', dark ? 'btn-gold' : 'btn-dark']}>
+                Get alerts <Icon name="arrow-right" size={16} class="arrow" />
+              </button>
+              <p class:list={['text-[13px]', muted]}>
+                Unsubscribe from any email.{' '}
+                <a href={href('/privacy/')} class="underline underline-offset-2">
+                  Privacy
+                </a>
+              </p>
+            </div>
+          </div>
+          <p class:list={['mt-3 text-[15px] font-medium', dark ? 'text-[#e9eff6]' : 'text-ink']} data-alerts-status role="status" aria-live="polite" />
+        </form>
+      </div>
+    </section>
+  )
+}

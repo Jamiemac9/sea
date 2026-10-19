@@ -1,0 +1,198 @@
+---
+import { statSync } from 'node:fs';
+import path from 'node:path';
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Icon from '@/components/Icon.astro';
+import Faq from '@/components/Faq.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import DownloadGate from '@/components/DownloadGate.astro';
+import TemplatePreview from '@/components/TemplatePreview.astro';
+import { templates, type Template } from '@/data/templates';
+import { brandTitle } from '@/site.config';
+import { href } from '@/lib/url';
+import { faqPage, howTo } from '@/lib/schema';
+
+export function getStaticPaths() {
+  return templates.map((t) => ({ params: { slug: t.slug }, props: { template: t } }));
+}
+
+interface Props {
+  template: Template;
+}
+const { template: t } = Astro.props;
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const url = `${origin}${href(`/templates/${t.slug}/`)}`;
+const mime =
+  t.format === 'Excel'
+    ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+let size = '';
+try {
+  size = `${Math.max(1, Math.round(statSync(path.join(process.cwd(), 'public', t.file)).size / 1024))} KB`;
+} catch {
+  /* file not generated yet: run npm run templates */
+}
+
+const others = templates.filter((x) => x.slug !== t.slug);
+const crumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'Templates', url: '/templates/' },
+  { name: t.title, url: `/templates/${t.slug}/` },
+];
+
+const ld = [
+  {
+    '@type': 'DigitalDocument',
+    '@id': `${url}#template`,
+    name: t.title,
+    description: t.description,
+    url,
+    encodingFormat: mime,
+    isAccessibleForFree: true,
+    inLanguage: 'en-GB',
+    audience: { '@type': 'Audience', audienceType: t.forAudience },
+    publisher: { '@id': `${origin}/#organization` },
+    isPartOf: { '@id': `${origin}/#website` },
+    abstract: t.quickAnswer,
+  },
+  howTo({ name: `How to use the ${t.title.toLowerCase()}`, steps: t.steps, url }),
+  faqPage(t.faqs, url),
+];
+---
+
+<Base title={t.title} fullTitle={brandTitle(t.seoTitle)} description={t.description} jsonLd={ld} breadcrumbs={crumbs} showFooterAd={false}>
+  <header class="hero relative pb-10 pt-8 md:pb-14 md:pt-12">
+    <div class="hero-grid"></div>
+    <div class="blob blob-a !opacity-50"></div>
+    <div class="container">
+      <Breadcrumbs items={crumbs.slice(0, 2)} />
+      <div class="mt-6 flex flex-wrap gap-2">
+        <span class="chip">Free template</span>
+        <span class="chip chip-ink">{t.format}, {t.pages}</span>
+        <span class="chip chip-ink">{t.forAudience}</span>
+      </div>
+      <h1 class="mt-5 max-w-4xl text-[2.3rem] font-[680] leading-[1.04] tracking-[-0.03em] md:text-[3.6rem]">{t.title}</h1>
+      <p class="lede mt-5 max-w-3xl">{t.description}</p>
+      <a href="#download" class="btn btn-primary mt-7 lg:hidden">
+        Get the free template <Icon name="arrow-right" size={16} class="arrow" />
+      </a>
+    </div>
+  </header>
+
+  <div class="container grid gap-12 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div class="min-w-0">
+      <section class="quick-answer reveal" aria-labelledby="quick-answer">
+        <p id="quick-answer" class="eyebrow">Quick answer</p>
+        <p class="mt-3 font-display text-[1.2rem] font-medium leading-snug text-ink md:text-[1.35rem]">{t.quickAnswer}</p>
+      </section>
+
+      <section class="mt-12" aria-labelledby="inside">
+        <h2 id="inside" class="text-[1.9rem]">What is inside</h2>
+        <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+          {
+            t.inside.map((item, i) => (
+              <li class="card reveal flex gap-3 p-5 text-[15.5px] leading-relaxed text-ink-2" style={`--i:${i}`}>
+                <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gold text-[#102a46]">
+                  <Icon name="check" size={13} stroke={3} />
+                </span>
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="mt-14" aria-labelledby="preview">
+        <h2 id="preview" class="text-[1.9rem]">What it looks like</h2>
+        <p class="mt-2 max-w-2xl text-[15.5px] text-muted">
+          {
+            t.format === 'Excel'
+              ? 'Formulas, drop-down lists and print settings are already set up. It opens in Excel, Google Sheets and LibreOffice.'
+              : 'Plain A4 pages with labelled boxes to fill in. Add your own logo and change anything you need.'
+          }
+        </p>
+        <div class="reveal mt-6">
+          <TemplatePreview template={t} />
+        </div>
+      </section>
+
+      <section class="mt-14" aria-labelledby="how-to">
+        <h2 id="how-to" class="text-[1.9rem]">How to use it</h2>
+        <ol class="mt-6 space-y-5">
+          {
+            t.steps.map((s, i) => (
+              <li id={`step-${i + 1}`} class="flex gap-4">
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink font-display text-[15px] font-semibold text-paper">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3 class="text-[1.15rem] font-semibold">{s.name}</h3>
+                  <p class="mt-1 text-[15.5px] leading-relaxed text-ink-2">{s.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="card mt-14 flex flex-col items-start gap-5 p-6 md:p-8" aria-labelledby="guide">
+        <div>
+          <p id="guide" class="eyebrow">Read the guide</p>
+          <p class="mt-2 max-w-xl text-[1.08rem] text-ink">
+            The template follows our guide. It explains what each section is for and what a council will ask to see.
+          </p>
+        </div>
+        <a href={href(t.guide.href)} class="btn btn-dark">
+          {t.guide.label} <Icon name="arrow-right" size={16} class="arrow" />
+        </a>
+      </section>
+
+      <section class="mt-16" aria-labelledby="faqs">
+        <h2 id="faqs" class="text-[1.9rem]">Questions people ask</h2>
+        <div class="mt-4"><Faq items={t.faqs} /></div>
+      </section>
+
+      <div class="mt-16">
+        <AuditCta
+          title="Want your plans and records checked?"
+          text="A template is a start. SEA Audit samples real files against what councils and the planned licensing conditions look for, and tells you what to fix first."
+          campaign="templates"
+          content={t.slug}
+        />
+      </div>
+    </div>
+
+    <aside>
+      <div class="sticky top-24 space-y-6">
+        <DownloadGate template={t} size={size} />
+        <p class="px-1 text-[13.5px] text-muted">
+          General information for services in England, not legal advice. Check your commissioner's contract for anything extra it asks for.
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <section class="container mt-24" aria-labelledby="more">
+    <div class="flex items-end justify-between gap-4">
+      <h2 id="more" class="text-[1.9rem]">More free templates</h2>
+      <a href={href('/templates/')} class="text-[15px] font-medium text-teal no-underline">All templates</a>
+    </div>
+    <div class="mt-6 grid gap-5 md:grid-cols-3">
+      {
+        others.map((o, i) => (
+          <a href={href(`/templates/${o.slug}/`)} class="card card-link reveal flex flex-col p-6" style={`--i:${i}`}>
+            <span class:list={['file-badge', o.format === 'Excel' ? 'file-badge-xl' : 'file-badge-doc']} aria-hidden="true">
+              {o.format === 'Excel' ? 'XLSX' : 'DOCX'}
+            </span>
+            <span class="mt-5 font-display text-[1.2rem] font-semibold leading-snug">{o.title}</span>
+            <span class="mt-2 text-[14.5px] text-muted">
+              {o.format}, {o.pages}
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</Base>

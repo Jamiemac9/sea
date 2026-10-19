@@ -1,0 +1,46 @@
+---
+/**
+ * A labelled link to a partner site from src/data/partners.ts. The label and
+ * rel attribute come from the partner's kind, so a paid link can never go out
+ * unlabelled or without rel="sponsored".
+ */
+import Icon from './Icon.astro';
+import { partners, partnerLabels, partnerRel } from '@/data/partners';
+import { audit } from '@/site.config';
+import { href } from '@/lib/url';
+
+interface Props {
+  id: string;
+  placement: string;
+}
+const { id, placement } = Astro.props;
+const p = partners[id];
+if (!p) throw new Error(`Unknown partner: ${id}`);
+
+const url = new URL(p.url);
+url.searchParams.set('utm_source', audit.utmSource);
+url.searchParams.set('utm_medium', p.kind === 'sister' ? 'referral' : p.kind);
+url.searchParams.set('utm_campaign', p.kind === 'sister' ? 'sister-site' : id);
+url.searchParams.set('utm_content', placement);
+---
+
+<aside class="partner card not-prose flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between md:p-7" aria-label={`${partnerLabels[p.kind]}: ${p.name}`}>
+  <div>
+    <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
+      {partnerLabels[p.kind]}
+    </p>
+    <p class="mt-2 font-display text-[1.25rem] font-semibold leading-snug">{p.title}</p>
+    <p class="mt-1.5 max-w-xl text-[15px] leading-relaxed text-ink-2">{p.text}</p>
+    {
+      p.kind !== 'sister' && (
+        <p class="mt-2 text-[13px] text-muted">
+          {p.kind === 'affiliate' ? 'We may earn a commission if you buy through this link. ' : 'Paid placement. '}
+          It does not change what we write. <a href={href('/about/#how-we-make-money')} class="underline underline-offset-2">How we make money</a>
+        </p>
+      )
+    }
+  </div>
+  <a href={url.toString()} target="_blank" rel={partnerRel(p.kind)} class="btn btn-ghost shrink-0" data-partner={id}>
+    {p.cta} <Icon name="arrow-up-right" size={16} />
+  </a>
+</aside>

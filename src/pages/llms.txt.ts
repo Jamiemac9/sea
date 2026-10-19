@@ -5,6 +5,7 @@ import { categories } from '@/content.config';
 import { site } from '@/site.config';
 import { href } from '@/lib/url';
 import keyFacts from '@/data/key-facts.json';
+import { templates } from '@/data/templates';
 
 /** llms.txt (llmstxt.org): a short map of the site for language models and answer engines. */
 export const GET: APIRoute = async ({ site: siteUrl }) => {
@@ -34,7 +35,12 @@ export const GET: APIRoute = async ({ site: siteUrl }) => {
     `- [FAQ](${abs('/faq/')}): Short answers to common questions on licensing, Housing Benefit and running a service.`,
     `- [Audit readiness check](${abs('/tools/audit-readiness/')}): A 24-question self-assessment against what councils and licensing look for.`,
     `- [Exempt accommodation checker](${abs('/tools/exempt-accommodation-checker/')}): Identifies the likely specified accommodation category for a scheme.`,
+    `- [Service charge calculator](${abs('/tools/service-charge-calculator/')}): Splits a weekly charge into lines eligible and ineligible for Housing Benefit.`,
     `- [Resources](${abs('/resources/')}): Legislation, official guidance and research with notes on each.`,
+    '',
+    '## Free templates',
+    '',
+    ...templates.map((t) => `- [${t.title}](${abs(`/templates/${t.slug}/`)}): ${t.quickAnswer.split('. ')[0]}.`),
     '',
     '## Optional',
     '',

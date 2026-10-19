@@ -6,6 +6,8 @@ import Icon from '@/components/Icon.astro';
 import GuideCard from '@/components/GuideCard.astro';
 import AdSlot from '@/components/AdSlot.astro';
 import AuditCta from '@/components/AuditCta.astro';
+import PartnerBlock from '@/components/PartnerBlock.astro';
+import { partnersFor } from '@/data/partners';
 import { audienceList, type Audience } from '@/data/audiences';
 import { href } from '@/lib/url';
 
@@ -81,6 +83,14 @@ const guides = (await getCollection('guides'))
       {guides.map((g, i) => <GuideCard guide={g} i={i} />)}
     </div>
   </section>
+
+  {
+    partnersFor({ page: `for-${a.slug}` }).map(([id]) => (
+      <div class="container mt-16">
+        <PartnerBlock id={id} placement={`audience-${a.slug}`} />
+      </div>
+    ))
+  }
 
   <div class="container mt-20">
     <AuditCta campaign={`audience-${a.slug}`} />

@@ -13,7 +13,7 @@ declare global {
     dataLayer: unknown[];
     gtag: (...args: unknown[]) => void;
     adsbygoogle: unknown[];
-    __seahub: { adsClient: string; consentMode: 'builtin' | 'external'; ga4: string; base: string };
+    __seahub: { adsClient: string; consentMode: 'builtin' | 'external'; ga4: string; base: string; forms: string };
   }
 }
 

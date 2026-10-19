@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
-import Icon from './Icon.astro';
 import AdSlot from './AdSlot.astro';
+import AlertsSignup from './AlertsSignup.astro';
 import { site, auditUrl } from '@/site.config';
 import { href } from '@/lib/url';
 
@@ -43,6 +43,7 @@ const columns = [
   {
     title: 'Hub',
     links: [
+      { label: 'Free templates', href: '/templates/' },
       { label: 'Tools', href: '/tools/' },
       { label: 'Glossary', href: '/glossary/' },
       { label: 'FAQ', href: '/faq/' },
@@ -79,9 +80,7 @@ const year = new Date().getFullYear();
         Guidance on this site covers England unless a page says otherwise. It is general information, not legal advice.
         For a decision about a specific claim or scheme, speak to the council or a specialist adviser.
       </p>
-      <a href={href('/tools/audit-readiness/')} class="btn btn-dark btn-sm mt-6">
-        Free readiness check <Icon name="arrow-right" size={15} class="arrow" />
-      </a>
+      <AlertsSignup variant="footer" placement="footer" title="Regulation alerts" />
     </div>
     <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
       {
@@ -111,6 +110,7 @@ const year = new Date().getFullYear();
         <button type="button" class="hover:text-ink" data-consent-open>Cookie settings</button>
         <a href={href('/llms.txt')} class="no-underline hover:text-ink">llms.txt</a>
         <a href={href('/rss.xml')} class="no-underline hover:text-ink">RSS</a>
+        <a href="https://apxdigital.io" rel="nofollow noopener" target="_blank" class="no-underline hover:text-ink">Website by apxdigital.io</a>
       </div>
     </div>
   </div>

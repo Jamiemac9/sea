@@ -21,7 +21,7 @@ const isActive = (h: string) => h === activeHref;
 
     <nav aria-label="Main" class="hidden items-center gap-0.5 xl:flex">
       {
-        nav.map((item) => (
+        nav.filter((item) => item.desktop !== false).map((item) => (
           <a href={href(item.href)} class="nav-link" aria-current={isActive(item.href) ? 'page' : undefined}>
             {'short' in item ? item.short : item.label}
           </a>

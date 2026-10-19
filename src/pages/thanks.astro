@@ -1,0 +1,21 @@
+---
+// Landing page for the confirmation link in the regulation alerts email
+// (set BREVO_DOI_REDIRECT_URL to this page's full URL).
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import { href } from '@/lib/url';
+---
+
+<Base noindex title="You are signed up" description="Your regulation alerts sign-up is confirmed. The next alert will come to your inbox when supported housing rules change.">
+  <PageHero
+    eyebrow="Regulation alerts"
+    title="You are signed up"
+    lede="Thanks for confirming. The next alert will come to your inbox when supported housing rules or dates change."
+  >
+    <div class="reveal mt-8 flex flex-wrap gap-3" style="--i:3">
+      <a href={href('/regulation-tracker/')} class="btn btn-primary">See the regulation tracker <Icon name="arrow-right" size={16} class="arrow" /></a>
+      <a href={href('/templates/')} class="btn btn-ghost">Free templates</a>
+    </div>
+  </PageHero>
+</Base>

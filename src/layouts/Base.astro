@@ -60,6 +60,7 @@ const runtime = { adsClient: ads.client, consentMode: ads.consent, ga4: analytic
     <meta name="theme-color" content="#f7f6f2" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a1626" media="(prefers-color-scheme: dark)" />
     <meta name="generator" content={Astro.generator} />
+    {ads.client && <meta name="google-adsense-account" content={ads.client} />}
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />

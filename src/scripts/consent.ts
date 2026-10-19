@@ -13,6 +13,7 @@ declare global {
     dataLayer: unknown[];
     gtag: (...args: unknown[]) => void;
     adsbygoogle: unknown[];
+    googlefc?: { callbackQueue?: unknown[]; showRevocationMessage?: () => void };
     __seahub: { adsClient: string; consentMode: 'builtin' | 'external'; ga4: string; base: string; forms: string };
   }
 }
@@ -45,6 +46,14 @@ function loadScript(src: string, attrs: Record<string, string> = {}) {
   document.head.appendChild(s);
 }
 
+function loadAnalytics() {
+  const { ga4 } = window.__seahub;
+  if (!ga4) return;
+  loadScript(`https://www.googletagmanager.com/gtag/js?id=${ga4}`);
+  window.gtag('js', new Date());
+  window.gtag('config', ga4, { anonymize_ip: true });
+}
+
 function applyConsent(c: Consent) {
   window.gtag('consent', 'update', {
     analytics_storage: c.analytics ? 'granted' : 'denied',
@@ -52,12 +61,7 @@ function applyConsent(c: Consent) {
     ad_user_data: c.ads ? 'granted' : 'denied',
     ad_personalization: c.ads ? 'granted' : 'denied',
   });
-  const { ga4 } = window.__seahub;
-  if (c.analytics && ga4) {
-    loadScript(`https://www.googletagmanager.com/gtag/js?id=${ga4}`);
-    window.gtag('js', new Date());
-    window.gtag('config', ga4, { anonymize_ip: true });
-  }
+  if (c.analytics) loadAnalytics();
   initAds(c.ads);
 }
 
@@ -65,17 +69,20 @@ let adsStarted = false;
 function initAds(allowed: boolean) {
   const { adsClient } = window.__seahub;
   const slots = Array.from(document.querySelectorAll<HTMLElement>('[data-ad-slot-wrap][data-provider="adsense"]'));
-  if (!adsClient || !slots.length) return;
+  if (!adsClient) return;
   if (!allowed) {
     slots.forEach(showHouse);
     return;
   }
   if (adsStarted) return;
   adsStarted = true;
+  // The script loads even on pages with no slot ids, so Auto ads (if switched
+  // on in AdSense) and Google's consent message can run.
   loadScript(`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsClient}`, {
     crossorigin: 'anonymous',
   });
   window.adsbygoogle = window.adsbygoogle || [];
+  if (!slots.length) return;
 
   const io = new IntersectionObserver(
     (entries) => {
@@ -118,8 +125,17 @@ function showHouse(wrap: HTMLElement) {
 export function initConsent() {
   const { consentMode } = window.__seahub;
   if (consentMode === 'external') {
-    // A certified CMP handles the message and the consent update.
+    // Google's certified CMP (AdSense Privacy & messaging) comes with the ad
+    // script. It shows the message and sends the Consent Mode update itself.
+    loadAnalytics();
     initAds(true);
+    document.querySelectorAll('[data-consent-open]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const fc = (window.googlefc = window.googlefc || {});
+        fc.callbackQueue = fc.callbackQueue || [];
+        fc.callbackQueue.push(() => window.googlefc?.showRevocationMessage?.());
+      }),
+    );
     return;
   }
 

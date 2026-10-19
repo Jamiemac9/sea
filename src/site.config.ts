@@ -76,18 +76,22 @@ export function auditUrl(campaign: string, content?: string, path = audit.bookPa
 
 /**
  * Advertising.
- * provider 'adsense' needs PUBLIC_ADSENSE_CLIENT (ca-pub-...) and slot ids.
- * Without a client id every slot shows a house ad for SEA Audit, so the layout
- * and the funnel work before an ad account is approved.
+ * The AdSense publisher id is public (it is printed in ads.txt), so it lives
+ * here. Set PUBLIC_ADSENSE_CLIENT=off on a staging build to switch ads off.
+ * Each placement shows a SEA Audit house ad until its slot id is set, and
+ * whenever ads are declined or unfilled. With the id alone, Auto ads work if
+ * they are turned on in the AdSense dashboard.
  *
  * consent 'builtin' uses the hub's own banner and Google Consent Mode v2.
  * consent 'external' assumes a Google-certified CMP (for example Google's
  * Privacy & messaging) shows its own message, which Google requires for
  * serving ads to UK and EEA visitors.
  */
+const adClient = env.PUBLIC_ADSENSE_CLIENT === 'off' ? '' : env.PUBLIC_ADSENSE_CLIENT || 'ca-pub-4641894074417695';
+
 export const ads = {
-  provider: env.PUBLIC_ADSENSE_CLIENT ? 'adsense' : 'house',
-  client: env.PUBLIC_ADSENSE_CLIENT || '',
+  provider: adClient ? 'adsense' : 'house',
+  client: adClient,
   consent: (env.PUBLIC_CONSENT_MODE as 'builtin' | 'external') || 'builtin',
   slots: {
     leaderboard: env.PUBLIC_ADSENSE_SLOT_LEADERBOARD || '',

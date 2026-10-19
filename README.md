@@ -96,9 +96,13 @@ Writing rules, enforced by `npm run lint:content`:
 
 ## Ads
 
-1. Apply for AdSense with the live domain.
-2. Set `PUBLIC_ADSENSE_CLIENT` and the slot ids, then redeploy. `/ads.txt` publishes the Google line automatically.
-3. For UK and EEA traffic Google requires a certified consent management platform. Turn on Google's Privacy and messaging (or another certified CMP) and set `PUBLIC_CONSENT_MODE=external`.
+The AdSense publisher id (`ca-pub-4641894074417695`) is set in `src/site.config.ts`. Every page carries the `google-adsense-account` meta tag and `/ads.txt` publishes the Google line, so either can be used to verify the site.
+
+1. In AdSense, add `exemptaccommodation.com` under Sites and verify it with the meta tag or ads.txt option. Wait for approval.
+2. Create four display ad units (leaderboard, in-article, sidebar, footer) and set their ids as `PUBLIC_ADSENSE_SLOT_LEADERBOARD`, `_IN_ARTICLE`, `_SIDEBAR` and `_FOOTER` in Cloudflare, then redeploy. Until then each slot shows a SEA Audit house ad. Auto ads also work if you switch them on, but they place ads wherever Google chooses.
+3. For UK traffic Google requires a certified consent platform. In AdSense, open Privacy and messaging, create and publish a European regulations message, then set `PUBLIC_CONSENT_MODE=external`. Google's message then replaces the site's own banner, and "Cookie settings" in the footer reopens it.
+
+Set `PUBLIC_ADSENSE_CLIENT=off` on a staging build to switch ads off.
 
 Every slot reserves its space before it loads, so ads do not shift the layout. If ads are declined or unfilled, the SEA Audit house ad shows instead.
 
@@ -188,6 +192,8 @@ For rate limiting, add a Cloudflare rate limiting rule on `/api/subscribe` (for 
 | `sister` | From our sister site | `noopener` |
 | `affiliate` | Affiliate link, with a commission note | `sponsored noopener` |
 | `sponsor` | Sponsored | `sponsored noopener` |
+
+Insurance, mortgage and lending partners are regulated by the FCA. Add their `fca` number and any `warning` they require, and use the wording they approve. Affiliate tracking links are used exactly as given, with no UTM tags added.
 
 HMO Profit is set up as the sister site on the rent, property and managing agents guides, the tools page and the housing provider and managing agent hubs. There is no sitewide link to it on purpose. To add an affiliate, add an entry with `kind: 'affiliate'` and list only the guides where the product helps a reader act on that guide. The about page's "How we make money" section covers all of these. The footer credit to apxdigital.io is `nofollow`.
 

@@ -102,15 +102,15 @@ const year = new Date().getFullYear();
     </div>
   </div>
   <div class="border-t border-line">
-    <div class="container flex flex-col gap-3 py-6 text-[13.5px] text-muted md:flex-row md:items-center md:justify-between">
-      <p>&copy; {year} {site.legalName}. Contains public sector information licensed under the Open Government Licence v3.0.</p>
-      <div class="flex flex-wrap gap-5">
+    <div class="container flex flex-col gap-3 py-6 text-[13.5px] text-muted lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+      <p class="max-w-xl">&copy; {year} {site.legalName}. Contains public sector information licensed under the Open Government Licence v3.0.</p>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 lg:shrink-0">
         <a href={href('/privacy/')} class="no-underline hover:text-ink">Privacy</a>
         <a href={href('/cookies/')} class="no-underline hover:text-ink">Cookies</a>
         <button type="button" class="hover:text-ink" data-consent-open>Cookie settings</button>
         <a href={href('/llms.txt')} class="no-underline hover:text-ink">llms.txt</a>
         <a href={href('/rss.xml')} class="no-underline hover:text-ink">RSS</a>
-        <a href="https://apxdigital.io" rel="nofollow noopener" target="_blank" class="no-underline hover:text-ink">Website by apxdigital.io</a>
+        <span class="lg:border-l lg:border-line lg:pl-5">Site made by <a href="https://apxdigital.io" rel="nofollow noopener" target="_blank" class="font-medium text-ink-2 underline-offset-2 hover:text-ink hover:underline">apxdigital.io</a></span>
       </div>
     </div>
   </div>

@@ -17,11 +17,15 @@ const { id, placement } = Astro.props;
 const p = partners[id];
 if (!p) throw new Error(`Unknown partner: ${id}`);
 
+// Our own tags go on sister links only. Affiliate and sponsor links are the
+// partner's tracking links and must be used exactly as given.
 const url = new URL(p.url);
-url.searchParams.set('utm_source', audit.utmSource);
-url.searchParams.set('utm_medium', p.kind === 'sister' ? 'referral' : p.kind);
-url.searchParams.set('utm_campaign', p.kind === 'sister' ? 'sister-site' : id);
-url.searchParams.set('utm_content', placement);
+if (p.kind === 'sister') {
+  url.searchParams.set('utm_source', audit.utmSource);
+  url.searchParams.set('utm_medium', 'referral');
+  url.searchParams.set('utm_campaign', 'sister-site');
+  url.searchParams.set('utm_content', placement);
+}
 ---
 
 <aside class="partner card not-prose flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between md:p-7" aria-label={`${partnerLabels[p.kind]}: ${p.name}`}>
@@ -31,6 +35,14 @@ url.searchParams.set('utm_content', placement);
     </p>
     <p class="mt-2 font-display text-[1.25rem] font-semibold leading-snug">{p.title}</p>
     <p class="mt-1.5 max-w-xl text-[15px] leading-relaxed text-ink-2">{p.text}</p>
+    {p.warning && <p class="mt-2 max-w-xl text-[14px] font-semibold text-ink">{p.warning}</p>}
+    {
+      p.fca && (
+        <p class="mt-1 text-[13px] text-muted">
+          {p.name} is authorised and regulated by the Financial Conduct Authority, firm reference {p.fca}.
+        </p>
+      )
+    }
     {
       p.kind !== 'sister' && (
         <p class="mt-2 text-[13px] text-muted">

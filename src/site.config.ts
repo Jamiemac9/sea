@@ -111,6 +111,16 @@ export const affiliates = {
   awinPublisherId: env.PUBLIC_AWIN_PUBLISHER_ID || '3128025',
 };
 
+/**
+ * Search engine site verification. Paste the content value from Google Search
+ * Console (HTML tag method) and Bing Webmaster Tools (meta tag method).
+ * Bing can also import a site straight from Search Console, with no tag.
+ */
+export const verification = {
+  google: env.PUBLIC_GOOGLE_SITE_VERIFICATION || '',
+  bing: env.PUBLIC_BING_SITE_VERIFICATION || '',
+};
+
 /** Optional analytics. GA4 only loads after analytics consent. */
 export const analytics = {
   ga4: env.PUBLIC_GA4_ID || '',
@@ -122,8 +132,9 @@ export const nav = [
   { label: 'Guides', href: '/guides/' },
   { label: 'Grey areas', href: '/guides/grey-areas-in-exempt-accommodation/' },
   { label: 'Regulation tracker', short: 'Tracker', href: '/regulation-tracker/' },
+  { label: 'Updates', href: '/updates/' },
   { label: 'Templates', href: '/templates/' },
   { label: 'Tools', href: '/tools/' },
-  { label: 'Glossary', href: '/glossary/' },
+  { label: 'Glossary', href: '/glossary/', desktop: false },
   { label: 'Resources', href: '/resources/', desktop: false },
 ];

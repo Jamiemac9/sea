@@ -1,0 +1,22 @@
+---
+import Icon from './Icon.astro';
+import { href, formatDate } from '@/lib/url';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  update: CollectionEntry<'updates'>;
+  i?: number;
+}
+const { update, i = 0 } = Astro.props;
+const d = update.data;
+---
+
+<a href={href(`/updates/${update.id}/`)} class="card card-link reveal flex h-full flex-col p-6" style={`--i:${i % 6}`}>
+  <div class="flex items-center justify-between gap-3">
+    <span class="chip chip-sun">{d.tag}</span>
+    <Icon name="arrow-up-right" size={18} class="card-arrow text-muted" />
+  </div>
+  <time datetime={d.published.toISOString()} class="mt-5 text-[13.5px] font-semibold text-teal">{formatDate(d.published)}</time>
+  <h3 class="mt-1.5 font-display text-[1.25rem] font-semibold leading-snug">{d.title}</h3>
+  <p class="mt-2 line-clamp-3 text-[15px] leading-relaxed text-muted">{d.description}</p>
+</a>

@@ -75,6 +75,7 @@ export function article(opts: {
   keyPoints: string[];
   citations: { title: string; url: string }[];
   about: string[];
+  image?: string;
 }): Thing {
   return {
     '@type': 'Article',
@@ -90,7 +91,7 @@ export function article(opts: {
     author: { '@type': 'Organization', name: site.editorialTeam, url: `${opts.origin}/about/` },
     publisher: { '@id': `${opts.origin}/#organization` },
     isPartOf: { '@id': `${opts.origin}/#website` },
-    image: `${opts.origin}/og-default.png`,
+    image: opts.image || `${opts.origin}/og-default.png`,
     abstract: opts.quickAnswer,
     about: opts.about.map((name) => ({ '@type': 'Thing', name })),
     citation: opts.citations.map((c) => ({ '@type': 'CreativeWork', name: c.title, url: c.url })),
@@ -100,6 +101,39 @@ export function article(opts: {
       name: 'The short version',
       itemListElement: opts.keyPoints.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p })),
     },
+  };
+}
+
+export function newsArticle(opts: {
+  url: string;
+  origin: string;
+  title: string;
+  description: string;
+  published: Date;
+  updated?: Date;
+  section: string;
+  summary: string;
+  image: string;
+  citations: { title: string; url: string }[];
+}): Thing {
+  return {
+    '@type': 'NewsArticle',
+    '@id': `${opts.url}#article`,
+    headline: opts.title,
+    description: opts.description,
+    url: opts.url,
+    mainEntityOfPage: opts.url,
+    datePublished: opts.published.toISOString(),
+    dateModified: (opts.updated || opts.published).toISOString(),
+    inLanguage: site.locale,
+    articleSection: opts.section,
+    author: { '@type': 'Organization', name: site.editorialTeam, url: `${opts.origin}/about/` },
+    publisher: { '@id': `${opts.origin}/#organization` },
+    isPartOf: { '@id': `${opts.origin}/#website` },
+    image: opts.image,
+    abstract: opts.summary,
+    citation: opts.citations.map((c) => ({ '@type': 'CreativeWork', name: c.title, url: c.url })),
+    speakable: { '@type': 'SpeakableSpecification', cssSelector: ['.quick-answer'] },
   };
 }
 

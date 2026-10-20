@@ -1,0 +1,175 @@
+---
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Icon from '@/components/Icon.astro';
+import Callout from '@/components/Callout.astro';
+import TableEl from '@/components/TableEl.astro';
+import AdSlot from '@/components/AdSlot.astro';
+import InArticleAd from '@/components/InArticleAd.astro';
+import AuditCta from '@/components/AuditCta.astro';
+import AlertsSignup from '@/components/AlertsSignup.astro';
+import GuideCard from '@/components/GuideCard.astro';
+import ShareLinks from '@/components/ShareLinks.astro';
+import { brandTitle } from '@/site.config';
+import { href, formatDate } from '@/lib/url';
+import { newsArticle } from '@/lib/schema';
+
+export async function getStaticPaths() {
+  const [updates, guides] = await Promise.all([getCollection('updates'), getCollection('guides')]);
+  return updates.map((update) => ({ params: { slug: update.id }, props: { update, guides } }));
+}
+
+interface Props {
+  update: CollectionEntry<'updates'>;
+  guides: CollectionEntry<'guides'>[];
+}
+const { update, guides } = Astro.props;
+const d = update.data;
+const { Content } = await render(update);
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const url = new URL(href(`/updates/${update.id}/`), origin + '/').toString();
+const og = `/og/updates/${update.id}.jpg`;
+const ogImage = existsSync(path.join(process.cwd(), 'public', og)) ? og : undefined;
+const related = d.guides.map((slug) => guides.find((g) => g.id === slug)).filter(Boolean) as CollectionEntry<'guides'>[];
+const crumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'Updates', url: '/updates/' },
+  { name: d.title, url: `/updates/${update.id}/` },
+];
+const ld = [
+  newsArticle({
+    url,
+    origin,
+    title: d.title,
+    description: d.description,
+    published: d.published,
+    updated: d.updated,
+    section: d.tag,
+    summary: d.summary,
+    image: `${origin}${href(ogImage || '/og-default.png')}`,
+    citations: d.sources,
+  }),
+];
+const components = { Callout, InArticleAd, table: TableEl };
+---
+
+<Base
+  title={d.title}
+  fullTitle={d.seoTitle ? brandTitle(d.seoTitle) : undefined}
+  description={d.description}
+  ogType="article"
+  ogImage={ogImage}
+  jsonLd={ld}
+  published={d.published}
+  updated={d.updated || d.published}
+  showFooterAd={false}
+  breadcrumbs={crumbs}
+>
+  <article>
+    <header class="hero relative pb-10 pt-8 md:pb-14 md:pt-12">
+      <div class="hero-grid"></div>
+      <div class="blob blob-a !opacity-50"></div>
+      <div class="container">
+        <Breadcrumbs items={crumbs.slice(0, 2)} />
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <span class="chip chip-sun">{d.tag}</span>
+          <span class="inline-flex items-center gap-1.5 text-[14px] text-muted">
+            <Icon name="calendar" size={15} />
+            <time datetime={d.published.toISOString()}>{formatDate(d.published)}</time>
+            {d.updated && <span>, updated {formatDate(d.updated)}</span>}
+          </span>
+        </div>
+        <h1 class="mt-5 max-w-4xl text-[2.2rem] font-[680] leading-[1.05] tracking-[-0.03em] md:text-[3.3rem]">{d.title}</h1>
+        <p class="lede mt-5 max-w-3xl">{d.description}</p>
+        <ShareLinks url={url} title={d.title} class="mt-6" />
+      </div>
+    </header>
+
+    <div class="container grid gap-12 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div class="min-w-0">
+        <section class="quick-answer reveal" aria-labelledby="in-short">
+          <p id="in-short" class="eyebrow">In short</p>
+          <p class="mt-3 font-display text-[1.2rem] font-medium leading-snug text-ink md:text-[1.35rem]">{d.summary}</p>
+        </section>
+
+        <div class="prose mt-10">
+          <Content components={components} />
+        </div>
+
+        <section class="card mt-12 p-6 md:p-8" aria-labelledby="what-to-do">
+          <h2 id="what-to-do" class="text-[1.4rem]">What to do now</h2>
+          <ol class="mt-4 space-y-3">
+            {
+              d.whatToDo.map((step, i) => (
+                <li class="flex gap-3 text-[15.5px] leading-relaxed text-ink-2">
+                  <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-[12px] font-bold text-paper">{i + 1}</span>
+                  <span>{step}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </section>
+
+        <div class="mt-12">
+          <AlertsSignup placement={`update-${update.id}`} title="Get the next update by email" />
+        </div>
+
+        {
+          d.sources.length > 0 && (
+            <section class="mt-14" aria-labelledby="sources">
+              <h2 id="sources" class="text-[1.6rem]">
+                Sources
+              </h2>
+              <ol class="mt-5 space-y-3">
+                {d.sources.map((s, i) => (
+                  <li class="flex gap-3 text-[15px]">
+                    <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-paper-2 text-[12px] font-bold text-ink-2">{i + 1}</span>
+                    <span>
+                      <a href={s.url} class="font-medium text-teal underline underline-offset-2" rel="noopener" target="_blank">
+                        {s.title}
+                      </a>
+                      {(s.publisher || s.date) && <span class="text-muted"> {[s.publisher, s.date].filter(Boolean).join(', ')}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )
+        }
+
+        <ShareLinks url={url} title={d.title} class="mt-12 border-t border-line pt-6" />
+
+        <div class="mt-12">
+          <AuditCta campaign="update" content={update.id} />
+        </div>
+      </div>
+
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 space-y-6">
+          <a href={href('/updates/')} class="inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-teal no-underline">
+            All updates <Icon name="arrow-right" size={15} />
+          </a>
+          <AdSlot name="sidebar" />
+        </div>
+      </aside>
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="container mt-24" aria-labelledby="related">
+          <h2 id="related" class="text-[1.9rem]">
+            The guides behind this update
+          </h2>
+          <div class="mt-6 grid gap-5 md:grid-cols-3">
+            {related.map((g, i) => (
+              <GuideCard guide={g} i={i} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </article>
+</Base>

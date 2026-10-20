@@ -51,4 +51,25 @@ const guides = defineCollection({
   }),
 });
 
-export const collections = { guides };
+// Short, dated news posts: what changed, what it means and what to do.
+// They feed the alerts email, social posts and the RSS feed.
+export const updateTags = ['Regulation', 'Housing Benefit', 'Practice', 'Sector'] as const;
+
+const updates = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/updates' }),
+  schema: z.object({
+    title: z.string(),
+    seoTitle: z.string().max(50).optional(),
+    description: z.string().min(70).max(160),
+    published: z.coerce.date(),
+    updated: z.coerce.date().optional(),
+    tag: z.enum(updateTags),
+    // The answer in two or three sentences. Shown first and used by answer engines.
+    summary: z.string().min(80).max(340),
+    whatToDo: z.array(z.string()).min(1).max(5),
+    guides: z.array(z.string()).default([]),
+    sources: z.array(source).default([]),
+  }),
+});
+
+export const collections = { guides, updates };

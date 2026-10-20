@@ -118,6 +118,18 @@ try {
   /* no facts file */
 }
 
+// Guides carry an updated date. Warn when one has not been reviewed for REVIEW_DAYS,
+// so the review rota shows up in every build.
+const REVIEW_DAYS = 120;
+for (const file of walk(path.join(root, 'src/content/guides')).filter((f) => f.endsWith('.mdx'))) {
+  const m = readFileSync(file, 'utf8').match(/^updated:\s*(\S+)/m);
+  if (!m) continue;
+  const age = Math.floor((Date.now() - new Date(m[1]).getTime()) / 86400000);
+  if (age > REVIEW_DAYS) {
+    findings.push({ file: path.relative(root, file), line: 1, id: 'review-due', level: 'warn', msg: `Last updated ${age} days ago. Check it against its sources, then update the date.`, text: m[1] });
+  }
+}
+
 const errors = findings.filter((f) => f.level === 'error');
 const warns = findings.filter((f) => f.level === 'warn');
 for (const f of findings) console.log(`${f.level === 'error' ? 'ERROR' : 'warn '} ${f.file}:${f.line}  [${f.id}] ${f.msg}${f.text ? `  "${f.text}"` : ''}`);

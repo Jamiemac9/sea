@@ -1,0 +1,85 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import UpdateCard from '@/components/UpdateCard.astro';
+import AlertsSignup from '@/components/AlertsSignup.astro';
+import GuideCard from '@/components/GuideCard.astro';
+import { sortedUpdates, sortedGuides } from '@/lib/content';
+import { href } from '@/lib/url';
+
+const updates = await sortedUpdates();
+// Guide changes are news too: show the most recently updated ones.
+const reviewed = (await sortedGuides()).sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime()).slice(0, 3);
+const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
+const ld = {
+  '@type': 'CollectionPage',
+  name: 'Supported housing updates',
+  url: `${origin}${href('/updates/')}`,
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: updates.map((u, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: `${origin}${href(`/updates/${u.id}/`)}`,
+      name: u.data.title,
+    })),
+  },
+};
+---
+
+<Base
+  title="Supported housing updates"
+  description="Short, dated updates on supported exempt accommodation: new rules, consultations, Housing Benefit changes and what each one means for your service."
+  jsonLd={[ld]}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: 'Updates', url: '/updates/' },
+  ]}
+>
+  <PageHero
+    eyebrow="Updates"
+    title="What changed, and what it means"
+    lede="Short posts when something changes in supported housing: the rule, who it affects and what to do. Each one links to the guide with the detail."
+    crumbs={[
+      { name: 'Home', url: '/' },
+      { name: 'Updates', url: '/updates/' },
+    ]}
+  />
+  <div class="container">
+    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {updates.map((u, i) => <UpdateCard update={u} i={i} />)}
+    </div>
+    <section class="mt-16" aria-labelledby="reviewed">
+      <h2 id="reviewed" class="text-[1.9rem]">Recently updated guides</h2>
+      <div class="mt-6 grid gap-5 md:grid-cols-3">
+        {reviewed.map((g, i) => <GuideCard guide={g} i={i} />)}
+      </div>
+    </section>
+    <section class="mt-16 grid gap-8 md:grid-cols-3" aria-label="About the updates">
+      <div>
+        <h2 class="text-[1.3rem]">What we cover</h2>
+        <p class="mt-2 text-[15px] leading-relaxed text-muted">
+          New regulations, consultations and their outcomes, Housing Benefit changes, regulator decisions and tribunal cases that
+          change how supported exempt accommodation works in England.
+        </p>
+      </div>
+      <div>
+        <h2 class="text-[1.3rem]">How we check them</h2>
+        <p class="mt-2 text-[15px] leading-relaxed text-muted">
+          Every update links to the primary source, such as the legislation, the government publication or the regulator's notice.
+          Where we rely on commentary from a law firm or charity, the source list says so.
+        </p>
+      </div>
+      <div>
+        <h2 class="text-[1.3rem]">Where the detail lives</h2>
+        <p class="mt-2 text-[15px] leading-relaxed text-muted">
+          Updates stay short. The full rules are in our <a href={href('/guides/')} class="text-teal underline underline-offset-2">guides</a>, and
+          every key date is on the <a href={href('/regulation-tracker/')} class="text-teal underline underline-offset-2">regulation tracker</a>.
+        </p>
+      </div>
+    </section>
+    <div class="mt-16">
+      <AlertsSignup variant="band" placement="updates-index" title="Get each update by email" />
+    </div>
+  </div>
+</Base>

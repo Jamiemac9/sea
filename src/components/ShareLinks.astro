@@ -1,0 +1,31 @@
+---
+/**
+ * Plain share links. No third-party scripts or tracking pixels: each one is a
+ * normal link to the network's own share page. LinkedIn comes first because
+ * that is where this sector shares.
+ */
+interface Props {
+  url: string;
+  title: string;
+  class?: string;
+}
+const { url, title, class: className } = Astro.props;
+const enc = encodeURIComponent;
+const links = [
+  { label: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
+  { label: 'X', href: `https://x.com/intent/post?url=${enc(url)}&text=${enc(title)}` },
+  { label: 'Email', href: `mailto:?subject=${enc(title)}&body=${enc(url)}` },
+];
+---
+
+<div class:list={['flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-muted', className]}>
+  <span>Share:</span>
+  {
+    links.map((l) => (
+      <a href={l.href} class="font-medium text-ink-2 underline-offset-2 hover:text-ink hover:underline" target={l.label === 'Email' ? undefined : '_blank'} rel="noopener">
+        {l.label}
+      </a>
+    ))
+  }
+  <button type="button" class="font-medium text-ink-2 hover:text-ink" data-copy={url}>Copy link</button>
+</div>

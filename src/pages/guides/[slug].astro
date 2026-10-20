@@ -1,4 +1,6 @@
 ---
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Base from '@/layouts/Base.astro';
 import Breadcrumbs from '@/components/Breadcrumbs.astro';
@@ -11,6 +13,7 @@ import InArticleAd from '@/components/InArticleAd.astro';
 import AuditCta from '@/components/AuditCta.astro';
 import GuideCard from '@/components/GuideCard.astro';
 import AlertsSignup from '@/components/AlertsSignup.astro';
+import ShareLinks from '@/components/ShareLinks.astro';
 import PartnerBlock from '@/components/PartnerBlock.astro';
 import { partnersFor } from '@/data/partners';
 import { templates } from '@/data/templates';
@@ -37,6 +40,8 @@ const minutes = readingMinutes(guide.body || '');
 const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
 const url = new URL(href(`/guides/${guide.id}/`), origin + '/').toString();
 const cat = categories[d.category];
+const og = `/og/guides/${guide.id}.jpg`;
+const ogImage = existsSync(path.join(process.cwd(), 'public', og)) ? og : undefined;
 
 const relatedFromFm = d.related.map((slug) => all.find((g) => g.id === slug)).filter(Boolean) as CollectionEntry<'guides'>[];
 const related = (
@@ -58,6 +63,7 @@ const ld = [
     keyPoints: d.keyPoints,
     citations: d.sources,
     about: [cat.label, ...d.audiences.map((a) => audiences[a])],
+    image: ogImage ? `${origin}${href(ogImage)}` : undefined,
   }),
   ...(d.faqs.length ? [faqPage(d.faqs, url)] : []),
   ...(d.howTo ? [howTo({ ...d.howTo, url })] : []),
@@ -73,6 +79,7 @@ const guideTemplates = templates.filter((t) => t.guide.href === `/guides/${guide
   fullTitle={d.seoTitle ? brandTitle(d.seoTitle) : undefined}
   description={d.description}
   ogType="article"
+  ogImage={ogImage}
   jsonLd={ld}
   published={d.published}
   updated={d.updated}
@@ -106,10 +113,8 @@ const guideTemplates = templates.filter((t) => t.guide.href === `/guides/${guide
           <span class="inline-flex items-center gap-1.5"><Icon name="calendar" size={15} /> Updated <time datetime={d.updated.toISOString()}>{formatDate(d.updated)}</time></span>
           <span class="inline-flex items-center gap-1.5"><Icon name="clock" size={15} /> {minutes} min read</span>
           <span class="inline-flex items-center gap-1.5"><Icon name="check" size={15} /> Checked against the sources listed below</span>
-          <button type="button" class="inline-flex items-center gap-1.5 hover:text-ink" data-copy={url}>
-            Copy link
-          </button>
         </div>
+        <ShareLinks url={url} title={d.title} class="mt-4" />
       </div>
     </header>
 
@@ -251,6 +256,8 @@ const guideTemplates = templates.filter((t) => t.guide.href === `/guides/${guide
             </div>
           )
         }
+
+        <ShareLinks url={url} title={d.title} class="mt-12 border-t border-line pt-6" />
 
         <div class="mt-16">
           <AuditCta

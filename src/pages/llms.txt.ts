@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { sortedGuides } from '@/lib/content';
+import { sortedGuides, sortedUpdates } from '@/lib/content';
 import { glossary } from '@/data/glossary';
 import { categories } from '@/content.config';
 import { site } from '@/site.config';
@@ -11,7 +11,7 @@ import { templates } from '@/data/templates';
 export const GET: APIRoute = async ({ site: siteUrl }) => {
   const origin = (siteUrl?.toString() || '').replace(/\/$/, '');
   const abs = (p: string) => `${origin}${href(p)}`;
-  const guides = await sortedGuides();
+  const [guides, updates] = await Promise.all([sortedGuides(), sortedUpdates()]);
   const lines: string[] = [
     `# ${site.name}`,
     '',
@@ -20,6 +20,11 @@ export const GET: APIRoute = async ({ site: siteUrl }) => {
     `Each guide starts with a quick answer and a short version of no more than five points, and lists its sources. Guidance covers England and is general information, not legal advice. Key facts last checked ${keyFacts.lastChecked}.`,
     '',
   ];
+  if (updates.length) {
+    lines.push('## Latest updates', '');
+    for (const u of updates.slice(0, 10)) lines.push(`- [${u.data.title}](${abs(`/updates/${u.id}/`)}) (${u.data.published.toISOString().slice(0, 10)}): ${u.data.summary.split('. ')[0]}.`);
+    lines.push('');
+  }
   for (const key of Object.keys(categories) as (keyof typeof categories)[]) {
     const items = guides.filter((g) => g.data.category === key);
     if (!items.length) continue;

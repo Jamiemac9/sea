@@ -14,7 +14,8 @@
     "lint:content": "node scripts/lint-content.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
     "images": "node scripts/make-images.mjs",
-    "templates": "node --experimental-strip-types --no-warnings scripts/make-templates.mjs"
+    "templates": "node --experimental-strip-types --no-warnings scripts/make-templates.mjs",
+    "og": "node --experimental-strip-types --no-warnings scripts/make-og.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.3",

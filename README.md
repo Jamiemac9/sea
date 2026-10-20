@@ -197,12 +197,27 @@ Insurance, mortgage and lending partners are regulated by the FCA. Add their `fc
 
 HMO Profit is set up as the sister site on the rent, property and managing agents guides, the tools page and the housing provider and managing agent hubs. There is no sitewide link to it on purpose. To add an affiliate, add an entry with `kind: 'affiliate'` and list only the guides where the product helps a reader act on that guide. The about page's "How we make money" section covers all of these. The footer credit to apxdigital.io is `nofollow`.
 
+## Getting indexed
+
+- **Google:** verify the domain in Search Console (the DNS option works with Cloudflare), then submit `https://exemptaccommodation.com/sitemap-index.xml`. To verify with a tag instead, set `PUBLIC_GOOGLE_SITE_VERIFICATION`.
+- **Bing:** in Bing Webmaster Tools, import the site from Search Console, or set `PUBLIC_BING_SITE_VERIFICATION`. Submit the same sitemap.
+- **IndexNow (Bing, Yandex, Seznam, Naver):** `.github/workflows/indexnow.yml` runs after every push to `main`, waits for the deploy, and submits the pages that changed. The key file is `public/48d8ca8382287108464131d1f048aab6.txt`. To submit every page once, open the Actions tab, choose "Notify search engines" and run it.
+- **Cloudflare:** turn on Crawler Hints (Caching, Configuration) for the domain as a backup signal.
+
+## Publishing routine
+
+Updates live in `src/content/updates/` and appear at `/updates/`, on the home page, in the RSS feed and in `llms.txt`. The weekly routine, the guide calendar and the checks before publishing are in `docs/content-plan.md`. The build warns (`review-due`) about any guide not updated for 120 days.
+
 ## Before launch
 
 - Have someone with sector knowledge check each guide against its sources, and keep that review going. The about page says this happens.
 - Have privacy and cookie pages reviewed by your data protection lead.
 - Set `SITE_URL`, verify the domain in Google Search Console and Bing Webmaster Tools, and submit `/sitemap-index.xml`.
 - Re-check the regulation tracker when draft licensing regulations are published.
+
+## Share images
+
+Every guide, update and template has its own share image in `public/og/`, so links posted on LinkedIn show the page title. After adding or renaming a page, run `npm run og` (it needs Playwright, like `npm run images`) and commit the new files. Pages without an image fall back to `og-default.png`.
 
 ## Regenerating images
 

@@ -8,6 +8,8 @@ import Faq from '@/components/Faq.astro';
 import AdSlot from '@/components/AdSlot.astro';
 import AuditCta from '@/components/AuditCta.astro';
 import AlertsSignup from '@/components/AlertsSignup.astro';
+import UpdateCard from '@/components/UpdateCard.astro';
+import { sortedUpdates } from '@/lib/content';
 import { templates } from '@/data/templates';
 import { audienceList } from '@/data/audiences';
 import { timeline } from '@/data/timeline';
@@ -77,6 +79,7 @@ const quick = [
 ];
 
 const recent = timeline.slice(-5);
+const latest = (await sortedUpdates()).slice(0, 3);
 const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
 ---
 
@@ -326,6 +329,23 @@ const origin = (Astro.site?.toString() || '').replace(/\/$/, '');
         ))
       }
     </ol>
+    {
+      latest.length > 0 && (
+        <div class="mt-14">
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <h3 class="font-display text-[1.6rem] font-semibold">Latest updates</h3>
+            <a href={href('/updates/')} class="text-[15px] font-medium text-teal no-underline">
+              All updates
+            </a>
+          </div>
+          <div class="mt-6 grid gap-5 md:grid-cols-3">
+            {latest.map((u, i) => (
+              <UpdateCard update={u} i={i} />
+            ))}
+          </div>
+        </div>
+      )
+    }
     <div class="reveal mt-10">
       <AlertsSignup
         variant="band"

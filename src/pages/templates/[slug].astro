@@ -1,5 +1,5 @@
 ---
-import { statSync } from 'node:fs';
+import { statSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import Base from '@/layouts/Base.astro';
 import Breadcrumbs from '@/components/Breadcrumbs.astro';
@@ -27,6 +27,9 @@ const mime =
   t.format === 'Excel'
     ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+const og = `/og/templates/${t.slug}.jpg`;
+const ogImage = existsSync(path.join(process.cwd(), 'public', og)) ? og : undefined;
 
 let size = '';
 try {
@@ -62,7 +65,7 @@ const ld = [
 ];
 ---
 
-<Base title={t.title} fullTitle={brandTitle(t.seoTitle)} description={t.description} jsonLd={ld} breadcrumbs={crumbs} showFooterAd={false}>
+<Base title={t.title} fullTitle={brandTitle(t.seoTitle)} description={t.description} ogImage={ogImage} jsonLd={ld} breadcrumbs={crumbs} showFooterAd={false}>
   <header class="hero relative pb-10 pt-8 md:pb-14 md:pt-12">
     <div class="hero-grid"></div>
     <div class="blob blob-a !opacity-50"></div>

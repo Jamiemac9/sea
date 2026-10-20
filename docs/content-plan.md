@@ -4,16 +4,17 @@ How ExemptAccommodation.com keeps publishing, keeps old pages accurate, and turn
 
 ## The weekly routine
 
-| Day | Task | Where |
-| --- | --- | --- |
-| Monday | Check gov.uk, the Regulator of Social Housing, DWP and the trade press for anything new. Publish an update if something changed. | `src/content/updates/` |
-| Wednesday | Publish or extend one guide from the calendar below. | `src/content/guides/` |
-| Friday | Review the oldest guide (the build lists any older than 120 days as `review-due`). Check facts against sources, then change `updated`. | `src/content/guides/` |
-| Every week | Three LinkedIn posts: the update, the guide, and one template or tool. | LinkedIn |
-| Monthly | One alerts email: the month's updates, one guide, one template. | Brevo or MailerLite |
-| Every 60 days | Re-check `src/data/key-facts.json` and the regulation tracker. | `src/data/` |
+The scheduled task "Weekly content drafts" does the drafting every Thursday and opens a pull request. Nothing is published until Jamie merges it. The full routine, across all four sites, is in [`docs/marketing/routine.md`](marketing/routine.md).
 
-Every push to `main` deploys the site and tells Bing and the other IndexNow engines which pages changed. Google picks changes up from the sitemap.
+| When | What | Who |
+| --- | --- | --- |
+| Thursday | Check for news. Draft next week's guide, any update, the oldest-guide review and three LinkedIn posts. | Scheduled task |
+| Thursday to Sunday | Review the pull request. Merge to publish, or comment to ask for changes. | Jamie |
+| Monday, Wednesday, Friday | Post the approved LinkedIn post, link in the first comment. | Jamie |
+| First Thursday of the month | Also draft a new template and the alerts email. | Scheduled task |
+| Every 60 days | Re-check `src/data/key-facts.json` and the regulation tracker. | Scheduled task, in the review step |
+
+Every merge to `main` deploys the site and tells Bing and the other IndexNow engines which pages changed. Google picks changes up from the sitemap.
 
 ## Writing an update
 

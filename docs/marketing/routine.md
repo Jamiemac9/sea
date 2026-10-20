@@ -17,6 +17,8 @@ Everything is a draft for Jamie to approve. Open pull requests. Never merge a pu
 
 Attach each with push access (`add_repo`, access `push`), clone it, and work on a branch named `content/<monday>`, where `<monday>` is the date of the Monday after the run, such as `content/2026-10-26`.
 
+If the GitHub tools for opening a pull request are not available, push the branch anyway and give Jamie the compare link instead, such as `https://github.com/Jamiemac9/sea/compare/main...content/2026-10-26`. Opening that link and pressing "Create pull request" does the same job.
+
 If a routine pull request on SEA Audit, the APX blog or the APX site is still open from an earlier week, do not open another on that repository. Add a comment to the open one saying this week's slot was skipped. ExemptAccommodation.com gets a pull request every week, because its LinkedIn posts are dated.
 
 ## Each run

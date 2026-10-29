@@ -1,6 +1,6 @@
 # ExemptAccommodation.com
 
-A resource hub for supported exempt accommodation (SEA) and supported housing in England, published by SEA Audit. It is a static Astro site: every page is plain HTML at build time, so search engines and AI answer engines can read all of it without running JavaScript.
+A resource hub for supported exempt accommodation (SEA) and supported housing in England, published by Support Audit. It is a static Astro site: every page is plain HTML at build time, so search engines and AI answer engines can read all of it without running JavaScript.
 
 ## Run it
 
@@ -35,13 +35,13 @@ Everything brand-related lives in `src/site.config.ts`. The logo is an SVG in `s
 | Variable | Purpose |
 | --- | --- |
 | `SITE_URL` | Public origin for canonicals, sitemap and structured data. Defaults to `https://exemptaccommodation.com`. Set it before launch. |
-| `PUBLIC_ADSENSE_CLIENT` | AdSense publisher id, `ca-pub-...`. Without it every slot shows a SEA Audit house ad. |
+| `PUBLIC_ADSENSE_CLIENT` | AdSense publisher id, `ca-pub-...`. Without it every slot shows a support audit house ad. |
 | `PUBLIC_ADSENSE_SLOT_LEADERBOARD`, `_IN_ARTICLE`, `_SIDEBAR`, `_FOOTER` | AdSense ad unit ids per placement. |
 | `PUBLIC_CONSENT_MODE` | `builtin` (default, the hub's own banner plus Google Consent Mode v2) or `external` (a Google-certified CMP shows the message). |
 | `PUBLIC_GA4_ID` | Optional GA4 id. Loads only after analytics consent. |
-| `PUBLIC_LEAD_ENDPOINT` | Optional URL that receives readiness check results as JSON. Set it to `/api/subscribe` to send them through the sign-up function below. Without it, results open seaaudit.com with scores in the query string. |
+| `PUBLIC_LEAD_ENDPOINT` | Optional URL that receives readiness check results as JSON. Set it to `/api/subscribe` to send them through the sign-up function below. Without it, results open supportaudit.co.uk with scores in the query string. |
 | `PUBLIC_SUBSCRIBE_ENDPOINT` | Where template downloads and alert sign-ups post. Default `/api/subscribe`, the Pages Function in `functions/api/subscribe.ts`. |
-| `PUBLIC_AUDIT_URL`, `PUBLIC_AUDIT_BOOK_PATH` | Where "Book an audit" links go. Default `https://seaaudit.com/`. |
+| `PUBLIC_AUDIT_URL`, `PUBLIC_AUDIT_BOOK_PATH` | Where "Book an audit" links go. Default `https://supportaudit.co.uk/`. |
 | `PUBLIC_CONTACT_EMAIL` | Contact address shown on the site. |
 
 ## What is on the site
@@ -99,14 +99,14 @@ Writing rules, enforced by `npm run lint:content`:
 The AdSense publisher id (`ca-pub-4641894074417695`) is set in `src/site.config.ts`. Every page carries the `google-adsense-account` meta tag and `/ads.txt` publishes the Google line, so either can be used to verify the site.
 
 1. In AdSense, add `exemptaccommodation.com` under Sites and verify it with the meta tag or ads.txt option. Wait for approval.
-2. Create four display ad units (leaderboard, in-article, sidebar, footer) and set their ids as `PUBLIC_ADSENSE_SLOT_LEADERBOARD`, `_IN_ARTICLE`, `_SIDEBAR` and `_FOOTER` in Cloudflare, then redeploy. Until then each slot shows a SEA Audit house ad. Auto ads also work if you switch them on, but they place ads wherever Google chooses.
+2. Create four display ad units (leaderboard, in-article, sidebar, footer) and set their ids as `PUBLIC_ADSENSE_SLOT_LEADERBOARD`, `_IN_ARTICLE`, `_SIDEBAR` and `_FOOTER` in Cloudflare, then redeploy. Until then each slot shows a Support Audit house ad. Auto ads also work if you switch them on, but they place ads wherever Google chooses.
 3. For UK traffic Google requires a certified consent platform. In AdSense, open Privacy and messaging, create and publish a European regulations message, then set `PUBLIC_CONSENT_MODE=external`. Google's message then replaces the site's own banner, and "Cookie settings" in the footer reopens it.
 
 Set `PUBLIC_ADSENSE_CLIENT=off` on a staging build to switch ads off.
 
-Every slot reserves its space before it loads, so ads do not shift the layout. If ads are declined or unfilled, the SEA Audit house ad shows instead.
+Every slot reserves its space before it loads, so ads do not shift the layout. If ads are declined or unfilled, the support audit house ad shows instead.
 
-## SEA Audit funnel
+## support audit funnel
 
 - All outbound links go through `auditUrl()` in `src/site.config.ts`, tagged `utm_source=exemptaccommodation` with a campaign per placement.
 - The readiness check posts this JSON to `PUBLIC_LEAD_ENDPOINT` when the visitor consents:
@@ -123,7 +123,7 @@ Every slot reserves its space before it loads, so ads do not shift the layout. I
 }
 ```
 
-Without an endpoint, the check opens seaaudit.com with `readiness_score`, `areas`, `gaps`, `organisation` and `schemes` as query parameters. Name and email are never put in the URL.
+Without an endpoint, the check opens supportaudit.co.uk with `readiness_score`, `areas`, `gaps`, `organisation` and `schemes` as query parameters. Name and email are never put in the URL.
 
 ## Templates
 
@@ -135,7 +135,7 @@ npm run templates
 
 This writes `public/downloads/*.docx` and `*.xlsx`. Commit the files. Each template has a landing page at `/templates/<slug>/` with the quick answer, a drawn preview, how-to steps (HowTo schema) and FAQs (FAQPage schema). `public/_headers` sends `X-Robots-Tag: noindex` for `/downloads/*`, so the landing pages rank instead of the raw files.
 
-The download form asks for name, email and role, with two unticked boxes: regulation alerts and SEA Audit contact. The file is shown whether or not the sign-up goes through, and the browser remembers the visitor so a second download skips the form.
+The download form asks for name, email and role, with two unticked boxes: regulation alerts and Support Audit contact. The file is shown whether or not the sign-up goes through, and the browser remembers the visitor so a second download skips the form.
 
 ## Email sign-ups
 
@@ -145,8 +145,8 @@ The download form asks for name, email and role, with two unticked boxes: regula
 2. Adds the email to Brevo or MailerLite, only on the lists the visitor agreed to:
    - downloads: everyone who downloads a template, for update notices about that template
    - alerts: only when they asked for regulation alerts
-   - audit: only when they agreed to SEA Audit contact (the readiness check form requires this)
-3. Forwards the whole submission to `LEAD_WEBHOOK_URL` if set, for a CRM, Zapier, Make or SEA Audit.
+   - audit: only when they agreed to support audit contact (the readiness check form requires this)
+3. Forwards the whole submission to `LEAD_WEBHOOK_URL` if set, for a CRM, Zapier, Make or support audit.
 
 Set these under Pages, Settings, Variables and secrets. Mark the API key and webhook secret as secrets.
 

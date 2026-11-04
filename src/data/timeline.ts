@@ -154,6 +154,15 @@ export const timeline: Milestone[] = [
     link: { label: "Renters' Rights Act guide", href: '/guides/renters-rights-act-supported-accommodation/' },
   },
   {
+    date: '3 November 2026',
+    iso: '2026-11-03',
+    title: 'RSH statutory inquiry into Ash-Shahada',
+    text: 'The regulator opens a rare independent statutory inquiry into Ash-Shahada Housing Association, a London landlord that provides supported exempt accommodation in Birmingham.',
+    status: 'done',
+    tag: 'Regulation',
+    link: { label: 'What the inquiry covers', href: '/updates/november-2026-rsh-statutory-inquiry-ash-shahada-birmingham/' },
+  },
+  {
     date: 'Later in 2026',
     iso: '2026-12',
     title: 'Draft licensing regulations',

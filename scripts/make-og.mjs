@@ -3,7 +3,7 @@
 // Usage: npm install --no-save playwright && npx playwright install chromium && npm run og
 // Writes public/og/<section>/<slug>.jpg. Commit the files.
 import { createRequire } from 'node:module';
-import { readFileSync, readdirSync, mkdirSync } from 'node:fs';
+import { readFileSync, readdirSync, mkdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { templates } from '../src/data/templates.ts';
@@ -80,6 +80,8 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
 for (const c of cards) {
   const file = path.join(root, 'public/og', `${c.out}.jpg`);
+  // An article with its own picture (made by scripts/make-post-image.mjs) keeps it.
+  if (existsSync(path.join(root, 'public/og', `${c.out}-post.jpg`))) continue;
   mkdirSync(path.dirname(file), { recursive: true });
   await page.setContent(html(c), { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);

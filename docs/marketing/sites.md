@@ -36,7 +36,7 @@ Cadence: one guide a fortnight. SEA Audit's guides are about audit practice: wha
 
 From the "next ten guides" in `SEARCH-SPEC.md`. Three of those topics are rules, not audit practice, so they move to ExemptAccommodation.com: supported exempt accommodation explained (already there), local supported housing strategies, and what councils look for in Housing Benefit claims.
 
-- [ ] Session notes that pass an audit, with examples
+- [x] Session notes that pass an audit, with examples (published 10 Nov 2026 as /resources/how-to-write-case-notes-support-audit-2026/ on supportaudit.co.uk)
 - [ ] Support plan goals that evidence real support
 - [ ] Risk assessments and risk management plans
 - [ ] A simple process for missed support sessions

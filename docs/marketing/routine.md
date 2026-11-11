@@ -11,7 +11,7 @@ Everything is a draft for Jamie to approve. Open pull requests. Never merge a pu
 | Site | Repository | Build check |
 | --- | --- | --- |
 | ExemptAccommodation.com | `Jamiemac9/sea` | `npm ci`, then `PW_PATH=/opt/node-tools/node_modules/playwright npm run og`, then `npm run build` (must end with 0 errors) |
-| SEA Audit | `Jamiemac9/supportaudit-site` | `npm install`, then `python3 tools/build.py` |
+| Support Audit (supportaudit.co.uk) | `Jamiemac9/supportaudit` | Plain HTML, no build step: check every internal link points at a page in the repo |
 | APX blog | `Jamiemac9/apx-blog` | Static HTML: open the page and check links |
 | APX Digital | `Jamiemac9/apx-digital-new-site` | Static HTML: open the page and check links |
 
@@ -19,7 +19,7 @@ Attach each with push access (`add_repo`, access `push`), clone it, and work on 
 
 If the GitHub tools for opening a pull request are not available, push the branch anyway and give Jamie the compare link instead, such as `https://github.com/Jamiemac9/sea/compare/main...content/2026-10-26`. Opening that link and pressing "Create pull request" does the same job.
 
-If a routine pull request on SEA Audit, the APX blog or the APX site is still open from an earlier week, do not open another on that repository. Add a comment to the open one saying this week's slot was skipped. ExemptAccommodation.com gets a pull request every week, because its LinkedIn posts are dated.
+If a routine pull request on Support Audit, the APX blog or the APX site is still open from an earlier week, do not open another on that repository. Add a comment to the open one saying this week's slot was skipped. ExemptAccommodation.com gets a pull request every week, because its LinkedIn posts are dated.
 
 ## Each run
 
@@ -39,17 +39,15 @@ d. **Template**, on the first run of each month: the next unticked template in `
 
 e. **Alerts email**, on the first run of each month: draft `docs/marketing/email/<yyyy-mm>.md`. The month's updates, one guide, one template, and the Mock Audit as the one call to action.
 
-f. **LinkedIn:** if `docs/marketing/linkedin/<monday>.md` does not exist, write three posts for that week (Monday, Wednesday, Friday) in the same format as the existing files. Follow "How to post" in `docs/marketing/linkedin-profile.md`. Link to pages that will be live once this week's pull requests are merged, with the UTM tags in `docs/marketing/README.md`. Mix the sites across the month: mostly SEA Audit and ExemptAccommodation.com, one HMO Profit or APX post at most each fortnight.
+f. **LinkedIn:** if `docs/marketing/linkedin/<monday>.md` does not exist, write three posts for that week (Monday, Wednesday, Friday) in the same format as the existing files. Follow "How to post" in `docs/marketing/linkedin-profile.md`. Link to pages that will be live once this week's pull requests are merged, with the UTM tags in `docs/marketing/README.md`. Mix the sites across the month: mostly Support Audit and ExemptAccommodation.com, one HMO Profit or APX post at most each fortnight.
 
 g. Run the build check. Then open the pull request "Weekly content: week of <monday>".
 
-### 3. SEA Audit (when no routine pull request is open)
+### 3. Support Audit (when no routine pull request is open)
 
-Do the one-off fixes in `docs/marketing/sites.md` first, skipping any that need something from Jamie (photo, ICO number, account access). Then the next unticked guide, at most one every two weeks.
+Support Audit is supportaudit.co.uk, repository `Jamiemac9/supportaudit` (plain HTML). Follow the "Support Audit" part of section 6 of `claude/runbook-daily-content.md` in the SEA project for where new guides go and what each one needs. The byline is "Jamie McCollin, founder, Support Audit". Mark anything that needs Jamie's own audit experience with a clear `[Jamie: ...]` note and list those notes in the pull request; a page with an open note does not publish.
 
-New guides go in `src/pages/` as `guide-<slug>.html`, in the same structure as `guide-support-file.html`, registered in `PAGES` in `tools/build.py` with a `/resources/<slug>/` URL, and linked from `resources.html`. Set `TODAY` in `tools/build.py` to the run date. The byline is "Jamie McCollin, founder, SEA Audit", so mark anything that needs Jamie's own audit experience with a clear `[Jamie: ...]` note to fill in, and list those notes in the pull request.
-
-Tick the items in `docs/marketing/sites.md` in the ExemptAccommodation.com pull request.
+Do the one-off fixes in `docs/marketing/sites.md` first, skipping any that need something from Jamie (photo, ICO number, account access). Tick the items in `docs/marketing/sites.md` in the ExemptAccommodation.com pull request.
 
 ### 4. APX (when no routine pull request is open)
 
@@ -63,6 +61,7 @@ Finish with a short summary: each pull request link, what is in it, and anything
 
 ## House style for everything
 
+- The audit business is **Support Audit** at **supportaudit.co.uk**. Never use the old name or the old domain, in copy, links, emails, images or LinkedIn posts. The build fails if either appears in the site or in a LinkedIn file.
 - UK English. Sentence case headings. Straight quotes. No em or en dashes.
 - Answer first. Lists of five or fewer, unless they are numbered steps.
 - Every fact has a source, primary sources first. Never invent a statistic, a quote, a client or a result.

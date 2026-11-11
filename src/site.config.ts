@@ -6,22 +6,25 @@
 
 const env = import.meta.env;
 
+// The old domain must never come back through an environment variable.
+const current = (v: string | undefined, fallback: string) => (v && !/sea-?audit\.com/i.test(v) ? v : fallback);
+
 export const site = {
   name: 'ExemptAccommodation.com',
   // Used where the full domain name would be clumsy, such as running text.
   shortName: 'Exempt Accommodation',
-  legalName: 'SEA Audit',
+  legalName: 'Support Audit',
   tagline: 'Plain-English guidance on supported exempt accommodation',
   description:
     'Guides, checklists and tools on exempt, supported, transitional and emergency accommodation for support providers, housing providers, managing agents and proptech teams in England.',
   locale: 'en-GB',
   // Who publishes the hub. Shown in bylines and Organization structured data.
   publisher: {
-    name: 'SEA Audit',
-    url: 'https://seaaudit.com',
+    name: 'Support Audit',
+    url: 'https://supportaudit.co.uk',
   },
   editorialTeam: 'The ExemptAccommodation.com editorial team',
-  contactEmail: env.PUBLIC_CONTACT_EMAIL || 'hello@seaaudit.com',
+  contactEmail: current(env.PUBLIC_CONTACT_EMAIL, 'contact@supportaudit.co.uk'),
   social: {
     linkedin: env.PUBLIC_LINKEDIN_URL || '',
   },
@@ -37,13 +40,13 @@ export function brandTitle(title: string): string {
   return full.length <= 60 ? full : title;
 }
 
-/** Audit funnel. Every outbound link to SEA Audit goes through auditUrl(). */
+/** Audit funnel. Every outbound link to Support Audit goes through auditUrl(). */
 export const audit = {
-  baseUrl: (env.PUBLIC_AUDIT_URL || 'https://seaaudit.com').replace(/\/$/, ''),
+  baseUrl: current(env.PUBLIC_AUDIT_URL, 'https://supportaudit.co.uk').replace(/\/$/, ''),
   bookPath: env.PUBLIC_AUDIT_BOOK_PATH || '/',
   utmSource: 'exemptaccommodation',
   // Optional: POST endpoint that receives readiness-check results and enquiries
-  // as JSON (a CRM webhook, Formspree, a SEA Audit API route). Leave empty to
+  // as JSON (a CRM webhook, Formspree, a Support Audit API route). Leave empty to
   // hand results over by URL parameters instead.
   leadEndpoint: env.PUBLIC_LEAD_ENDPOINT || '',
 };
@@ -78,7 +81,7 @@ export function auditUrl(campaign: string, content?: string, path = audit.bookPa
  * Advertising.
  * The AdSense publisher id is public (it is printed in ads.txt), so it lives
  * here. Set PUBLIC_ADSENSE_CLIENT=off on a staging build to switch ads off.
- * Each placement shows a SEA Audit house ad until its slot id is set, and
+ * Each placement shows a Support Audit house ad until its slot id is set, and
  * whenever ads are declined or unfilled. With the id alone, Auto ads work if
  * they are turned on in the AdSense dashboard.
  *

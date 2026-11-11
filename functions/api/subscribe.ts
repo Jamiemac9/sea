@@ -4,12 +4,12 @@
  * Receives template downloads, regulation alert sign-ups and readiness check
  * results from the site, adds the email to the right lists in Brevo or
  * MailerLite, and forwards the full submission to an optional webhook (a CRM,
- * Zapier, Make or a SEA Audit endpoint).
+ * Zapier, Make or a Support Audit endpoint).
  *
  * Lists only get an email the visitor agreed to:
  * - downloads: everyone who downloads a template, for template update notices
  * - alerts: only when the visitor asked for regulation alerts
- * - audit: only when the visitor agreed to SEA Audit contacting them
+ * - audit: only when the visitor agreed to Support Audit contacting them
  *
  * Environment variables (Pages > Settings > Variables and secrets):
  *   EMAIL_PROVIDER         brevo or mailerlite. Optional when only one key is set.

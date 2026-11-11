@@ -1,7 +1,7 @@
 ---
 /**
  * Soft email gate for a free template. The visitor gives a name, email and
- * role, and can opt in to regulation alerts and SEA Audit contact (both
+ * role, and can opt in to regulation alerts and Support Audit contact (both
  * unticked). The file is revealed whether or not the sign-up succeeds, and
  * returning visitors on the same browser skip the form.
  */
@@ -61,7 +61,7 @@ const id = `gate-${t.slug}`;
     </label>
     <label class="flex items-start gap-3 text-[14px] text-ink-2">
       <input type="checkbox" name="audit" class="mt-1 h-4 w-4 shrink-0 accent-[var(--teal)]" />
-      <span>SEA Audit can contact me about an audit of our service.</span>
+      <span>Support Audit can contact me about an audit of our service.</span>
     </label>
     <button type="submit" class="btn btn-primary mt-2 w-full">
       Download the template <Icon name="arrow-right" size={16} class="arrow" />

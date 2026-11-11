@@ -13,17 +13,17 @@ The guide calendar and weekly routine are in [`docs/content-plan.md`](../content
 Each template gets a landing page under `/templates/`, built from `src/data/templates.ts` and `scripts/make-templates.mjs`.
 
 - [ ] **Staff training matrix** (Excel). Roles, courses, last done, next due, with overdue highlighting. Links to the training guide and Care Skills Training once approved.
-- [ ] **Risk assessment and risk management plan** (Word). Links to SEA Audit's risk guide.
+- [ ] **Risk assessment and risk management plan** (Word). Links to Support Audit's risk guide.
 - [ ] **Property compliance tracker** (Excel). Certificates, expiry dates and responsible person per property. Links to the property guide and insurance partners.
 - [ ] **Move-on plan** (Word). Links to the transitional housing guide.
 
 ### Alerts email, once a month
 
-The month's updates, one guide, one template, and the SEA Audit Mock Audit as the one call to action. Draft it in `docs/marketing/email/<yyyy-mm>.md` for Jamie to paste into Brevo or MailerLite.
+The month's updates, one guide, one template, and the Support Audit Mock Audit as the one call to action. Draft it in `docs/marketing/email/<yyyy-mm>.md` for Jamie to paste into Brevo or MailerLite.
 
-## SEA Audit (Jamiemac9/supportaudit-site)
+## Support Audit (Jamiemac9/supportaudit)
 
-Cadence: one guide a fortnight. SEA Audit's guides are about audit practice: what good evidence looks like, written by an auditor. The rules themselves live on ExemptAccommodation.com.
+Cadence: one guide a fortnight. Support Audit's guides are about audit practice: what good evidence looks like, written by an auditor. The rules themselves live on ExemptAccommodation.com.
 
 ### One-off fixes
 
@@ -66,8 +66,8 @@ Cadence: one brief a month on the blog, plus case studies on the work page. Each
 - [ ] **Web:** How we built ExemptAccommodation.com: a sector resource site with templates, alerts and a regulation tracker.
 - [ ] **Lead generation:** Email-gated templates that never block the download, and why that gets more sign-ups than a hard gate.
 - [ ] **Web:** Getting a new site into Bing in a day with IndexNow and a GitHub Action. 84 pages accepted on 20 October 2026.
-- [ ] **Web:** SEA Audit's site: a static build with structured data and a search spec written before the first page.
+- [ ] **Web:** Support Audit's site: a static build with structured data and a search spec written before the first page.
 
 ### Work page
 
-- [ ] Add ExemptAccommodation.com and SEA Audit as case studies on `work.html`, each linking to the live site.
+- [ ] Add ExemptAccommodation.com and Support Audit as case studies on `work.html`, each linking to the live site.

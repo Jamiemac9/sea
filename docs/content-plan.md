@@ -1,6 +1,6 @@
 # Content plan
 
-How ExemptAccommodation.com keeps publishing, keeps old pages accurate, and turns readers into email subscribers, SEA Audit enquiries and affiliate clicks.
+How ExemptAccommodation.com keeps publishing, keeps old pages accurate, and turns readers into email subscribers, Support Audit enquiries and affiliate clicks.
 
 ## The weekly routine
 
@@ -22,20 +22,20 @@ An update is 250 to 500 words: what changed, who it affects, what to do. Copy `s
 
 ## Guide calendar
 
-Each guide targets a question people search for, and has a natural next step that earns: an SEA Audit enquiry, a template download, an alerts sign-up or a labelled affiliate link.
+Each guide targets a question people search for, and has a natural next step that earns: a Support Audit enquiry, a template download, an alerts sign-up or a labelled affiliate link.
 
 | Week | Guide | Search it answers | Earns through |
 | --- | --- | --- | --- |
-| 1 | How to set up a supported housing service | how to start supported housing | SEA Audit, HMO Profit, insurance and training affiliates |
+| 1 | How to set up a supported housing service | how to start supported housing | Support Audit, HMO Profit, insurance and training affiliates |
 | 2 | Intensive housing management explained | intensive housing management housing benefit | Service charge calculator, rent schedule template |
-| 3 | How councils review exempt accommodation claims | exempt accommodation housing benefit review | SEA Audit |
+| 3 | How councils review exempt accommodation claims | exempt accommodation housing benefit review | Support Audit |
 | 4 | Fire risk assessments for supported shared houses | fire risk assessment supported housing | Fire safety and insurance affiliates |
 | 5 | DBS checks for supported housing staff | DBS check supported housing | DBS and training affiliates |
 | 6 | Safeguarding adults in supported housing | safeguarding supported housing | Care Skills Training |
 | 7 | HMO licensing for supported housing | HMO licence supported housing | HMO Profit, insurance |
-| 8 | Supported accommodation for 16 and 17 year olds | Ofsted supported accommodation registration | Training, SEA Audit |
+| 8 | Supported accommodation for 16 and 17 year olds | Ofsted supported accommodation registration | Training, Support Audit |
 | 9 | Choosing software for supported housing | supported housing software | Software affiliates or sponsors |
-| 10 | Rent officer referrals and unreasonably high rents | exempt accommodation rent officer | SEA Audit |
+| 10 | Rent officer referrals and unreasonably high rents | exempt accommodation rent officer | Support Audit |
 | 11 | Mental health supported accommodation | mental health supported accommodation | Training |
 | 12 | Move-on planning that works | move on supported housing | Support plan template |
 

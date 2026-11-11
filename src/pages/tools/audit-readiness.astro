@@ -137,7 +137,7 @@ const clientData = {
 
         <div class="dark-band relative overflow-hidden rounded-[28px] p-6 md:p-9 no-print" data-lead>
           <p class="eyebrow">Next step</p>
-          <h3 class="mt-3 max-w-xl text-[1.7rem] leading-tight">Send these results to SEA Audit for a free review call</h3>
+          <h3 class="mt-3 max-w-xl text-[1.7rem] leading-tight">Send these results to Support Audit for a free review call</h3>
           <p class="mt-2 max-w-xl text-[#b9c8d8]">An auditor will look at your scores and tell you which gaps a council or licensing officer is most likely to pick up.</p>
           <form class="mt-6 grid gap-3 md:grid-cols-2" data-lead-form>
             <label class="block">
@@ -164,7 +164,7 @@ const clientData = {
             </label>
             <label class="flex items-start gap-3 text-[14px] text-[#b9c8d8] md:col-span-2">
               <input type="checkbox" name="consent" required class="mt-1 h-4 w-4 accent-[var(--gold)]" />
-              <span>I agree to SEA Audit contacting me about these results. See the <a href={href('/privacy/')} class="underline">privacy notice</a>.</span>
+              <span>I agree to Support Audit contacting me about these results. See the <a href={href('/privacy/')} class="underline">privacy notice</a>.</span>
             </label>
             <div class="flex flex-wrap items-center gap-3 md:col-span-2">
               <button type="submit" class="btn btn-gold">Send my results <Icon name="arrow-right" size={16} class="arrow" /></button>
@@ -377,7 +377,7 @@ const clientData = {
     form.scrollIntoView({ behavior: 'smooth' });
   });
 
-  // Hand results to SEA Audit: POST to the lead endpoint if configured, otherwise open seaaudit.com with a summary.
+  // Hand results to Support Audit: POST to the lead endpoint if configured, otherwise open supportaudit.co.uk with a summary.
   const leadForm = document.querySelector<HTMLFormElement>('[data-lead-form]')!;
   const status = document.querySelector<HTMLElement>('[data-lead-status]')!;
   leadForm.addEventListener('submit', async (e) => {
@@ -403,7 +403,7 @@ const clientData = {
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error(String(res.status));
-        status.textContent = 'Sent. SEA Audit will be in touch.';
+        status.textContent = 'Sent. Support Audit will be in touch.';
         leadForm.reset();
       } catch {
         status.textContent = 'That did not send. Try again, or email us your results.';
@@ -417,7 +417,7 @@ const clientData = {
     if (contact.organisation) url.searchParams.set('organisation', contact.organisation);
     if (contact.schemes) url.searchParams.set('schemes', contact.schemes);
     window.open(url.toString(), '_blank', 'noopener');
-    status.textContent = 'We opened SEA Audit in a new tab with your scores.';
+    status.textContent = 'We opened Support Audit in a new tab with your scores.';
   });
 
   restore();

@@ -130,6 +130,22 @@ for (const file of walk(path.join(root, 'src/content/guides')).filter((f) => f.e
   }
 }
 
+// Brand: the audit business is Support Audit at supportaudit.co.uk. The old name and
+// domain fail the build anywhere in the site code, the content or the LinkedIn files.
+const brandFiles = [
+  ...walk(path.join(root, 'src')),
+  ...walk(path.join(root, 'functions')),
+  ...walk(path.join(root, 'docs/marketing/linkedin')),
+  path.join(root, '.env.example'),
+];
+const oldBrand = new RegExp(['SEA ' + 'Audit', 'sea' + 'audit\\.com'].join('|'), 'gi');
+for (const file of brandFiles) {
+  readFileSync(file, 'utf8').split('\n').forEach((raw, i) => {
+    const m = raw.match(oldBrand);
+    if (m) findings.push({ file: path.relative(root, file), line: i + 1, id: 'old-brand', level: 'error', msg: 'Old brand. Use "Support Audit" and supportaudit.co.uk.', text: m[0] });
+  });
+}
+
 const errors = findings.filter((f) => f.level === 'error');
 const warns = findings.filter((f) => f.level === 'warn');
 for (const f of findings) console.log(`${f.level === 'error' ? 'ERROR' : 'warn '} ${f.file}:${f.line}  [${f.id}] ${f.msg}${f.text ? `  "${f.text}"` : ''}`);

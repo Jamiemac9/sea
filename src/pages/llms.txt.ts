@@ -51,7 +51,7 @@ export const GET: APIRoute = async ({ site: siteUrl }) => {
     '',
     `- [Full text of every guide](${abs('/llms-full.txt')}): All guides as plain markdown in one file.`,
     `- [About and editorial standards](${abs('/about/')}): Who publishes the hub and how guides are written and checked.`,
-    `- [SEA Audit](${site.publisher.url}): Independent audits of supported exempt accommodation.`,
+    `- [Support Audit](${site.publisher.url}): Independent audits of supported exempt accommodation.`,
     '',
   );
   return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });

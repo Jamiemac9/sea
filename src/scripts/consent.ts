@@ -119,7 +119,7 @@ function showHouse(wrap: HTMLElement) {
   const label = wrap.querySelector<HTMLElement>('[data-ad-label]');
   if (live) live.hidden = true;
   if (house) house.hidden = false;
-  if (label) label.textContent = 'Promoted by SEA Audit';
+  if (label) label.textContent = 'Promoted by Support Audit';
 }
 
 export function initConsent() {

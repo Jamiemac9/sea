@@ -5,7 +5,7 @@
  *
  * With PUBLIC_ADSENSE_CLIENT and a slot id set, the slot holds an AdSense
  * unit that is only requested once the visitor has consented and the slot is
- * near the viewport. The SEA Audit house ad is always in the markup: it shows
+ * near the viewport. The Support Audit house ad is always in the markup: it shows
  * when ads are not configured, not consented to, or come back unfilled.
  */
 import { ads, auditUrl, type AdSlotName } from '@/site.config';
@@ -23,14 +23,14 @@ const live = ads.provider === 'adsense' && Boolean(slotId);
 
 const houseAds = {
   leaderboard: {
-    kicker: 'From SEA Audit',
+    kicker: 'From Support Audit',
     title: 'Licensing is coming. Know where your schemes stand before the council does.',
     cta: 'Take the free readiness check',
     href: href('/tools/audit-readiness/'),
     tone: 'dark',
   },
   inArticle: {
-    kicker: 'From SEA Audit',
+    kicker: 'From Support Audit',
     title: 'Independent audits of support files, Housing Benefit evidence and property standards.',
     cta: 'See how an audit works',
     href: auditUrl('house-ad', 'in-article'),
@@ -44,9 +44,9 @@ const houseAds = {
     tone: 'dark',
   },
   footer: {
-    kicker: 'From SEA Audit',
+    kicker: 'From Support Audit',
     title: 'Getting a scheme ready for review? Book an independent support and compliance audit.',
-    cta: 'Talk to SEA Audit',
+    cta: 'Talk to Support Audit',
     href: auditUrl('house-ad', 'footer'),
     tone: 'mint',
   },
@@ -56,7 +56,7 @@ const vertical = name === 'sidebar';
 ---
 
 <aside class:list={['ad', className]} data-format={name} data-provider={live ? 'adsense' : 'house'} data-ad-slot-wrap>
-  <span class="ad-label" data-ad-label>{live ? 'Advertisement' : 'Promoted by SEA Audit'}</span>
+  <span class="ad-label" data-ad-label>{live ? 'Advertisement' : 'Promoted by Support Audit'}</span>
   {
     live && (
       <div class="ad-frame" data-ad-live hidden>

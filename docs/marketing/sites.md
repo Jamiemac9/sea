@@ -37,7 +37,7 @@ Cadence: one guide a fortnight. Support Audit's guides are about audit practice:
 From the "next ten guides" in `SEARCH-SPEC.md`. Three of those topics are rules, not audit practice, so they move to ExemptAccommodation.com: supported exempt accommodation explained (already there), local supported housing strategies, and what councils look for in Housing Benefit claims.
 
 - [x] Session notes that pass an audit, with examples (published 10 Nov 2026 as /resources/how-to-write-case-notes-support-audit-2026/ on supportaudit.co.uk)
-- [ ] Support plan goals that evidence real support
+- [x] Support plan goals that evidence real support (published 12 Nov 2026 as /resources/individual-support-plan-goals-2026/ on supportaudit.co.uk)
 - [ ] Risk assessments and risk management plans
 - [ ] A simple process for missed support sessions
 - [ ] Evidencing move-on in transitional housing

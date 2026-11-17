@@ -39,7 +39,7 @@ From the "next ten guides" in `SEARCH-SPEC.md`. Three of those topics are rules,
 - [x] Session notes that pass an audit, with examples (published 10 Nov 2026 as /resources/how-to-write-case-notes-support-audit-2026/ on supportaudit.co.uk)
 - [x] Support plan goals that evidence real support (published 12 Nov 2026 as /resources/individual-support-plan-goals-2026/ on supportaudit.co.uk)
 - [x] Risk assessments and risk management plans (published 14 Nov 2026 as /resources/risk-management-plan-supported-housing-2026/ on supportaudit.co.uk)
-- [ ] A simple process for missed support sessions
+- [x] A simple process for missed support sessions (published 17 Nov 2026 as /resources/missed-support-sessions-supported-housing-2026/ on supportaudit.co.uk)
 - [ ] Evidencing move-on in transitional housing
 - [ ] What the Gold, Green, Amber and Red ratings mean
 - [ ] Registered Provider or managing agent: who is responsible for what in the file

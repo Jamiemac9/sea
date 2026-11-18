@@ -45,10 +45,10 @@ export const audit = {
   baseUrl: current(env.PUBLIC_AUDIT_URL, 'https://supportaudit.co.uk').replace(/\/$/, ''),
   bookPath: env.PUBLIC_AUDIT_BOOK_PATH || '/',
   utmSource: 'exemptaccommodation',
-  // Optional: POST endpoint that receives readiness-check results and enquiries
-  // as JSON (a CRM webhook, Formspree, a Support Audit API route). Leave empty to
-  // hand results over by URL parameters instead.
-  leadEndpoint: env.PUBLIC_LEAD_ENDPOINT || '',
+  // POST endpoint that receives readiness-check results as JSON. Defaults to the
+  // sign-up function so every result is captured. Set PUBLIC_LEAD_ENDPOINT to
+  // "none" to hand results over by URL parameters instead.
+  leadEndpoint: env.PUBLIC_LEAD_ENDPOINT === 'none' ? '' : env.PUBLIC_LEAD_ENDPOINT || '/api/subscribe',
 };
 
 /**

@@ -22,6 +22,9 @@
  *   LEAD_WEBHOOK_URL       Optional. Receives every submission as JSON.
  *   LEAD_WEBHOOK_SECRET    Optional. Sent as the X-Webhook-Secret header.
  *   ALLOWED_ORIGINS        Optional. Extra origins allowed to post, comma separated.
+ *   NOTIFY_TO              Optional. Emailed (via Brevo) for every readiness result and
+ *                          every download where the visitor agreed to Support Audit contact.
+ *   NOTIFY_FROM            Optional. Verified Brevo sender for that email. Default info@apxdigital.io.
  */
 
 type Env = {
@@ -35,6 +38,8 @@ type Env = {
   LEAD_WEBHOOK_URL?: string;
   LEAD_WEBHOOK_SECRET?: string;
   ALLOWED_ORIGINS?: string;
+  NOTIFY_TO?: string;
+  NOTIFY_FROM?: string;
 };
 
 type Context = {
@@ -159,6 +164,8 @@ async function toBrevo(env: Env, sub: Submission, keys: ListKey[]): Promise<{ ok
   const attributes: Record<string, string> = {};
   if (first) attributes.FIRSTNAME = first;
   if (last) attributes.LASTNAME = last;
+  if (sub.role) attributes.ROLE = sub.role;
+  attributes.SOURCE = `exemptaccommodation-${sub.type}${sub.template ? `-${sub.template}` : ''}`;
 
   // With double opt-in set up, alert sign-ups get a confirmation email and
   // join the alerts list only when they click it.
@@ -167,11 +174,15 @@ async function toBrevo(env: Env, sub: Submission, keys: ListKey[]): Promise<{ ok
   let ok = true;
 
   if (!doi || direct.length) {
-    const res = await fetch('https://api.brevo.com/v3/contacts', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ email: sub.email, attributes, listIds: direct, updateEnabled: true }),
-    });
+    const create = (attrs: Record<string, string>) =>
+      fetch('https://api.brevo.com/v3/contacts', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ email: sub.email, attributes: attrs, listIds: direct, updateEnabled: true }),
+      });
+    let res = await create(attributes);
+    // An attribute the account does not have yet must never lose the contact.
+    if (res.status === 400) res = await create(Object.fromEntries(Object.entries(attributes).filter(([k]) => k === 'FIRSTNAME' || k === 'LASTNAME')));
     ok = res.ok;
   }
   if (doi) {
@@ -218,6 +229,35 @@ async function toWebhook(env: Env, sub: Submission): Promise<boolean> {
   return res.ok;
 }
 
+/** Emails a lead alert for submissions that asked Support Audit to get in touch. */
+async function notify(env: Env, sub: Submission): Promise<boolean> {
+  const lines = [
+    `Type: ${sub.type}${sub.template ? ` (${sub.template})` : ''}`,
+    `Name: ${sub.name || '-'}`,
+    `Email: ${sub.email}`,
+    `Role: ${sub.role || '-'}`,
+    `Page: ${sub.page || '-'}`,
+    `Alerts: ${sub.consents.alerts ? 'yes' : 'no'}  Support Audit contact: ${sub.consents.audit ? 'yes' : 'no'}`,
+    `Submitted: ${sub.submittedAt}`,
+  ];
+  if (sub.readiness) {
+    const r = sub.readiness as Record<string, unknown>;
+    lines.push('', `Organisation: ${r.organisation || '-'}`, `Schemes: ${r.schemes || '-'}`, `Overall score: ${r.score}`, `Areas: ${JSON.stringify(r.areas)}`, `Priority gaps: ${JSON.stringify(r.priorityGaps)}`);
+  }
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': env.EMAIL_API_KEY!, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      sender: { name: 'exemptaccommodation.com', email: env.NOTIFY_FROM || 'info@apxdigital.io' },
+      to: env.NOTIFY_TO!.split(',').map((e) => ({ email: e.trim() })).filter((t) => t.email),
+      replyTo: { email: sub.email, ...(sub.name ? { name: sub.name } : {}) },
+      subject: sub.type === 'readiness' ? `Readiness check result: ${(sub.readiness as Record<string, unknown>)?.organisation || sub.email}` : `Lead from exemptaccommodation.com: ${sub.email}`,
+      textContent: lines.join('\n'),
+    }),
+  });
+  return res.ok;
+}
+
 function originAllowed(request: Request, env: Env): boolean {
   const origin = request.headers.get('Origin');
   if (!origin) return true;
@@ -259,6 +299,12 @@ export async function onRequestPost(context: Context): Promise<Response> {
     // The visitor does not need to wait for the webhook when a list provider is set.
     if (p && context.waitUntil) context.waitUntil(hook.catch(() => undefined));
     else tasks.push(hook);
+  }
+
+  if (p === 'brevo' && env.NOTIFY_TO && sub.consents.audit && !sub.repeat) {
+    const alert = notify(env, sub).catch(() => false);
+    if (context.waitUntil) context.waitUntil(alert);
+    else await alert;
   }
 
   const results = await Promise.allSettled(tasks);

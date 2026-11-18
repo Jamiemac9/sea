@@ -50,7 +50,8 @@ Everything brand-related lives in `src/site.config.ts`. The logo is an SVG in `s
 - A glossary of 42 terms with a page each (`src/data/glossary.ts`).
 - A regulation tracker (`src/data/timeline.ts`), FAQ (`src/data/faqs.ts`), resources directory (`src/data/resources.ts`) and four audience hubs at `/for/...` (`src/data/audiences.ts`).
 - Three tools: the audit readiness check (`src/data/readiness.ts`), the exempt accommodation checker and the service charge calculator.
-- Four free templates at `/templates/` (`src/data/templates.ts`): a support plan and a needs assessment in Word, a rent and service charge schedule and a licensing readiness checklist in Excel.
+- Four free templates at `/templates/` (`src/data/templates.ts`): a support plan and a needs assessment in Word, a rent and service charge schedule and a licensing readiness checklist in Excel. Rebuild with `npm run templates`.
+  Design rule for every downloadable: never a plain form. Use the branded building blocks in `scripts/make-templates.mjs` (navy cover band, how-to-use step cards, numbered section tiles, tip callouts, goal cards, keep-together blocks, Support Audit call to action; Excel banners, colour-coded status and score bars). Render to PDF and check every page before publishing.
 - Regulation alert sign-ups on the tracker, the home page, regulation guides, the templates page and the footer.
 - About, advertise, privacy and cookie pages.
 

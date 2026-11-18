@@ -23,7 +23,9 @@ import {
   TableCell,
   TableRow,
   TextRun,
+  VerticalAlign,
   WidthType,
+  TabStopType,
 } from 'docx';
 import ExcelJS from 'exceljs';
 import { areas } from '../src/data/readiness.ts';
@@ -37,6 +39,9 @@ const TEAL = '129994';
 const TEAL_DARK = '0E7A76';
 const MINT = 'E7F6F4';
 const LINE = 'C9CFD8';
+const PALE = 'F4F7FA';
+const MUTED = '5B6B80';
+const AUDIT_URL = 'supportaudit.co.uk/book-a-call';
 const SITE = 'exemptaccommodation.com';
 
 // ---------------------------------------------------------------- Word helpers
@@ -52,18 +57,115 @@ const cellMargins = { top: 90, bottom: 90, left: 120, right: 120 };
 
 const p = (text, opts = {}) =>
   new Paragraph({ spacing: { after: 120 }, ...opts, children: [new TextRun({ text, ...(opts.run || {}) })] });
-const h1 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_1, keepNext: true, children: [new TextRun(text)] });
-const h2 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_2, keepNext: true, children: [new TextRun(text)] });
-const bullet = (text) => new Paragraph({ numbering: { reference: 'bullets', level: 0 }, keepNext: true, spacing: { after: 60 }, children: [new TextRun(text)] });
-const hint = (text) => new Paragraph({ spacing: { after: 120 }, keepNext: true, children: [new TextRun({ text, italics: true, color: '5B6B80', size: 19 })] });
+const bullet = (text) => new Paragraph({ numbering: { reference: 'bullets', level: 0 }, keepNext: true, spacing: { after: 60 }, children: [new TextRun({ text, color: '33475E' })] });
+const none = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+const noBorders = { top: none, bottom: none, left: none, right: none };
+const fill = (c) => ({ type: ShadingType.CLEAR, color: 'auto', fill: c });
+const run = (text, o = {}) => new TextRun({ text, ...o });
 
-function cell(text, width, { shade = false, bold = false, keep = false } = {}) {
+/** One-cell coloured panel used for banners, tips and calls to action. */
+function panel(paragraphs, { bg = NAVY, total = PORTRAIT_W, left = null, pad = 240 } = {}) {
+  return new Table({
+    width: { size: total, type: WidthType.DXA },
+    columnWidths: [total],
+    rows: [
+      new TableRow({
+        cantSplit: true,
+        children: [
+          new TableCell({
+            width: { size: total, type: WidthType.DXA },
+            shading: fill(bg),
+            borders: left ? { ...noBorders, left: { style: BorderStyle.SINGLE, size: 36, color: left } } : noBorders,
+            margins: { top: pad, bottom: pad, left: pad + 60, right: pad + 60 },
+            children: paragraphs,
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+/** Cover band at the top of the first page. */
+function cover(title, subtitle, meta, total = PORTRAIT_W) {
+  return panel(
+    [
+      new Paragraph({ spacing: { after: 80 }, children: [run('FREE TEMPLATE', { bold: true, color: '8FE3DC', size: 17, characterSpacing: 40 }), run('   ·   ExemptAccommodation.com', { color: 'B8C7D9', size: 17 })] }),
+      new Paragraph({ spacing: { after: 100 }, children: [run(title, { bold: true, color: 'FFFFFF', size: 60 })] }),
+      new Paragraph({ spacing: { after: 140 }, children: [run(subtitle, { color: 'DCE6F0', size: 22 })] }),
+      new Paragraph({ children: meta.flatMap((m, i) => [run(i ? '      ' : ''), run('■ ', { color: TEAL, size: 18 }), run(m, { color: 'FFFFFF', size: 18, bold: true })]) }),
+    ],
+    { total, pad: 360 },
+  );
+}
+
+/** Three numbered "how to use" cards. */
+function steps(items, total = PORTRAIT_W) {
+  const w = Math.floor(total / items.length);
+  const widths = items.map((_, i) => (i === items.length - 1 ? total - w * (items.length - 1) : w));
+  return new Table({
+    width: { size: total, type: WidthType.DXA },
+    columnWidths: widths,
+    rows: [
+      new TableRow({
+        cantSplit: true,
+        children: items.map(
+          ([head, body], i) =>
+            new TableCell({
+              width: { size: widths[i], type: WidthType.DXA },
+              shading: fill(MINT),
+              borders: { ...noBorders, top: { style: BorderStyle.SINGLE, size: 24, color: TEAL }, right: { style: BorderStyle.SINGLE, size: 24, color: 'FFFFFF' } },
+              margins: { top: 160, bottom: 160, left: 180, right: 180 },
+              children: [
+                new Paragraph({ spacing: { after: 60 }, children: [run(String(i + 1).padStart(2, '0'), { bold: true, color: TEAL, size: 32 })] }),
+                new Paragraph({ spacing: { after: 40 }, children: [run(head, { bold: true, color: NAVY, size: 20 })] }),
+                new Paragraph({ children: [run(body, { color: '33475E', size: 18 })] }),
+              ],
+            }),
+        ),
+      }),
+    ],
+  });
+}
+
+let sectionNo = 0;
+/** Numbered section heading: teal number tile and a navy title on a rule. */
+function h2(text, total = PORTRAIT_W) {
+  const m = /^(\d+)\.\s+(.*)$/.exec(text);
+  const num = m ? m[1] : String(++sectionNo);
+  const label = m ? m[2] : text;
+  const nw = 620;
+  return new Table({
+    width: { size: total, type: WidthType.DXA },
+    columnWidths: [nw, total - nw],
+    rows: [
+      new TableRow({
+        cantSplit: true,
+        children: [
+          new TableCell({ width: { size: nw, type: WidthType.DXA }, shading: fill(TEAL), borders: noBorders, verticalAlign: VerticalAlign.CENTER, margins: { top: 60, bottom: 60, left: 60, right: 60 }, children: [new Paragraph({ keepNext: true, alignment: AlignmentType.CENTER, children: [run(num.padStart(2, '0'), { bold: true, color: 'FFFFFF', size: 24 })] })] }),
+          new TableCell({ width: { size: total - nw, type: WidthType.DXA }, borders: { ...noBorders, bottom: { style: BorderStyle.SINGLE, size: 12, color: TEAL } }, verticalAlign: VerticalAlign.CENTER, margins: { top: 60, bottom: 60, left: 200, right: 60 }, children: [new Paragraph({ keepNext: true, children: [run(label, { bold: true, color: NAVY, size: 28 })] })] }),
+        ],
+      }),
+    ],
+  });
+}
+/** Section headings with their own spacing paragraph above. */
+const H2 = (text, total) => [new Paragraph({ spacing: { before: 240, after: 0 }, keepNext: true, children: [] }), h2(text, total), new Paragraph({ spacing: { after: 100 }, keepNext: true, children: [] })];
+
+/** Slim navy band that opens a new part of the document. */
+const h1 = (text, total = PORTRAIT_W) =>
+  panel([new Paragraph({ keepNext: true, children: [run(text, { bold: true, color: 'FFFFFF', size: 36 })] })], { total, pad: 200 });
+
+const hint = (text, total = PORTRAIT_W) =>
+  panel([new Paragraph({ keepNext: true, children: [run('TIP   ', { bold: true, color: TEAL_DARK, size: 17, characterSpacing: 30 }), run(text, { color: '33475E', size: 19 })] })], { bg: MINT, left: TEAL, total, pad: 140 });
+
+function cell(text, width, { shade = false, bold = false, keep = false, head = false } = {}) {
   return new TableCell({
     width: { size: width, type: WidthType.DXA },
-    borders,
+    borders: head ? { top: none, bottom: none, left: { style: BorderStyle.SINGLE, size: 4, color: '2A4B70' }, right: { style: BorderStyle.SINGLE, size: 4, color: '2A4B70' } } : shade ? { ...borders, left: { style: BorderStyle.SINGLE, size: 24, color: TEAL } } : borders,
     margins: cellMargins,
-    shading: shade ? { type: ShadingType.CLEAR, color: 'auto', fill: MINT } : undefined,
-    children: [new Paragraph({ keepNext: keep, children: [new TextRun({ text: text || '', bold, color: bold ? NAVY : undefined, size: 20 })] })],
+    verticalAlign: VerticalAlign.CENTER,
+    shading: head ? fill(NAVY) : shade ? fill(MINT) : undefined,
+    children: [new Paragraph({ keepNext: keep, children: [new TextRun({ text: text || '', bold: bold || head, color: head ? 'FFFFFF' : bold ? NAVY : undefined, size: head ? 18 : 20 })] })],
   });
 }
 
@@ -77,52 +179,114 @@ function fieldTable(labels, total = PORTRAIT_W, labelW = 3400) {
       const keep = i < labels.length - 1; // keep the whole table on one page
       return new TableRow({
         cantSplit: true,
-        height: { value: 480, rule: HeightRule.ATLEAST },
+        height: { value: 520, rule: HeightRule.ATLEAST },
         children: [cell(label, widths[0], { shade: true, bold: true, keep }), cell('', widths[1], { keep })],
       });
     }),
   });
 }
 
-/** A bordered box to write in. */
-function answerBox(height = 1600, total = PORTRAIT_W) {
+/** A bordered box to write in, with a small label. */
+function answerBox(height = 1600, total = PORTRAIT_W, label = 'Notes') {
   return new Table({
     width: { size: total, type: WidthType.DXA },
     columnWidths: [total],
-    rows: [new TableRow({ height: { value: height, rule: HeightRule.ATLEAST }, children: [cell('', total)] })],
+    rows: [
+      new TableRow({
+        height: { value: height, rule: HeightRule.ATLEAST },
+        children: [
+          new TableCell({
+            width: { size: total, type: WidthType.DXA },
+            borders: { ...borders, left: { style: BorderStyle.SINGLE, size: 24, color: LINE } },
+            shading: fill('FBFCFD'),
+            margins: cellMargins,
+            children: [new Paragraph({ children: [run(label.toUpperCase(), { bold: true, color: '9AA7B6', size: 15, characterSpacing: 30 })] })],
+          }),
+        ],
+      }),
+    ],
   });
 }
 
-/** Header row plus blank rows. */
+/** Header row plus blank rows, with light banding. */
 function gridTable(headers, widths, rows = 6, rowHeight = 560) {
   const total = widths.reduce((a, b) => a + b, 0);
   return new Table({
     width: { size: total, type: WidthType.DXA },
     columnWidths: widths,
     rows: [
-      new TableRow({ tableHeader: true, cantSplit: true, children: headers.map((h, i) => cell(h, widths[i], { shade: true, bold: true, keep: true })) }),
-      ...Array.from({ length: rows }, () => new TableRow({ cantSplit: true, height: { value: rowHeight, rule: HeightRule.ATLEAST }, children: widths.map((w) => cell('', w)) })),
+      new TableRow({ tableHeader: true, cantSplit: true, height: { value: 460, rule: HeightRule.ATLEAST }, children: headers.map((h, i) => cell(h, widths[i], { head: true, keep: true })) }),
+      ...Array.from(
+        { length: rows },
+        (_, r) =>
+          new TableRow({
+            cantSplit: true,
+            height: { value: rowHeight, rule: HeightRule.ATLEAST },
+            children: widths.map((w) => new TableCell({ width: { size: w, type: WidthType.DXA }, borders, margins: cellMargins, shading: r % 2 ? fill(PALE) : undefined, children: [new Paragraph({ children: [] })] })),
+          }),
+      ),
     ],
   });
 }
 
+/** Goal card: teal bar with the goal number, then the prompts. */
+function goalCard(n, labels, total = PORTRAIT_W) {
+  return [
+    new Paragraph({ spacing: { before: 240 }, keepNext: true, children: [] }),
+    keep([panel([new Paragraph({ keepNext: true, children: [run(`GOAL ${n}`, { bold: true, color: 'FFFFFF', size: 22, characterSpacing: 40 }), run("     in the resident's own words", { color: 'D6F3F0', size: 18, italics: true })] })], { bg: TEAL, total, pad: 120 }),
+    fieldTable(labels, total, 3600)], total),
+  ];
+}
+
+/** Closing call to action for Support Audit. */
+function cta(total = PORTRAIT_W) {
+  return [
+    new Paragraph({ spacing: { before: 360 }, keepNext: true, children: [] }),
+    keep([panel(
+      [
+        new Paragraph({ spacing: { after: 80 }, keepNext: true, children: [run('■ ■ ■ ■  ', { color: TEAL, size: 16 }), run('SUPPORT AUDIT', { bold: true, color: '8FE3DC', size: 17, characterSpacing: 40 })] }),
+        new Paragraph({ spacing: { after: 80 }, keepNext: true, children: [run('Would your files stand up to a licensing check?', { bold: true, color: 'FFFFFF', size: 30 })] }),
+        new Paragraph({ spacing: { after: 100 }, keepNext: true, children: [run('Support Audit carries out independent audits of resident support files in supported exempt accommodation. Every file is rated Gold, Green, Amber or Red, with the reason and what good looks like.', { color: 'DCE6F0', size: 19 })] }),
+        new Paragraph({ children: [run('Book a free discovery call:  ', { color: 'FFFFFF', size: 19 }), run(AUDIT_URL, { bold: true, color: '8FE3DC', size: 19 })] }),
+      ],
+      { total, pad: 320 },
+    )], total),
+  ];
+}
+
 const gap = () => new Paragraph({ spacing: { after: 160 }, keepNext: true, children: [] });
+
+/** Wraps a heading and its content in one unsplittable block, so a heading is never left alone at the foot of a page. */
+function keep(children, total = PORTRAIT_W) {
+  return new Table({
+    width: { size: total, type: WidthType.DXA },
+    columnWidths: [total],
+    rows: [new TableRow({ cantSplit: true, children: [new TableCell({ width: { size: total, type: WidthType.DXA }, borders: noBorders, margins: { top: 0, bottom: 0, left: 0, right: 0 }, children: [...children, new Paragraph({ children: [] })] })] })],
+  });
+}
+const block = (title, content, total = PORTRAIT_W) => [new Paragraph({ spacing: { before: 120 }, children: [] }), keep([h2(title, total), new Paragraph({ spacing: { after: 100 }, children: [] }), ...content], total)];
 
 function docShell(title, sections) {
   const header = new Header({
     children: [
       new Paragraph({
-        alignment: AlignmentType.RIGHT,
-        children: [new TextRun({ text: 'Exempt', bold: true, color: TEAL, size: 18 }), new TextRun({ text: 'Accommodation.com', bold: true, color: NAVY, size: 18 })],
+        tabStops: [{ type: TabStopType.RIGHT, position: PORTRAIT_W }],
+        border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: TEAL, space: 6 } },
+        children: [run(title.toUpperCase(), { bold: true, color: MUTED, size: 15, characterSpacing: 30 }), run('\t'), run('Exempt', { bold: true, color: TEAL, size: 18 }), run('Accommodation.com', { bold: true, color: NAVY, size: 18 })],
       }),
     ],
   });
   const footer = new Footer({
     children: [
       new Paragraph({
+        tabStops: [{ type: TabStopType.RIGHT, position: PORTRAIT_W }],
+        border: { top: { style: BorderStyle.SINGLE, size: 4, color: LINE, space: 6 } },
         children: [
-          new TextRun({ text: `${title}. Free template from ${SITE}. Adapt it to your service and your commissioner's requirements.  Page `, color: '5B6B80', size: 16 }),
-          new TextRun({ children: [PageNumber.CURRENT], color: '5B6B80', size: 16 }),
+          run(`Free template from ${SITE}. Adapt it to your service and your commissioner's requirements.`, { color: MUTED, size: 15 }),
+          run('\tPage ', { color: MUTED, size: 15 }),
+          new TextRun({ children: [PageNumber.CURRENT], color: NAVY, bold: true, size: 15 }),
+          run(' of ', { color: MUTED, size: 15 }),
+          new TextRun({ children: [PageNumber.TOTAL_PAGES], color: NAVY, bold: true, size: 15 }),
         ],
       }),
     ],
@@ -132,7 +296,7 @@ function docShell(title, sections) {
     title,
     description: `${title} template for supported housing in England`,
     styles: {
-      default: { document: { run: { font: 'Arial', size: 21 } } },
+      default: { document: { run: { font: 'Arial', size: 21, color: '1F2D3D' } } },
       paragraphStyles: [
         { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 40, bold: true, color: NAVY }, paragraph: { spacing: { before: 120, after: 120 }, outlineLevel: 0 } },
         { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 26, bold: true, color: TEAL_DARK }, paragraph: { spacing: { before: 280, after: 100 }, outlineLevel: 1 } },
@@ -158,13 +322,19 @@ function docShell(title, sections) {
 // ---------------------------------------------------------------- Needs assessment
 
 function needsAssessment() {
-  const section = (title, prompts, height = 1700) => [h2(title), ...prompts.map(bullet), gap(), answerBox(height)];
+  sectionNo = 0;
+  const section = (title, prompts, height = 1700) => block(title, [...prompts.map(bullet), gap(), answerBox(height, PORTRAIT_W, 'What the resident told us')]);
   const children = [
-    h1('Needs assessment'),
-    p('Complete this with the resident on the day they move in, or within four weeks at the latest. The support plan is built from it, so take the time to get it right.'),
-    hint('Use referral information as a starting point, not a copy. Write in plain words the resident would recognise.'),
-    h2('About this assessment'),
-    fieldTable([
+    cover('Needs assessment', 'The starting point for every support plan. Complete it with the resident, in plain words they would recognise.', ['Within 4 weeks of move-in', '7 areas of need', 'Feeds the support plan']),
+    gap(),
+    steps([
+      ['Sit down together', 'Complete it with the resident on move-in day, or within four weeks at the latest.'],
+      ['Work through each area', 'Use the prompts as a guide, not a script. Write down what the resident says.'],
+      ['Turn needs into goals', 'Rate each need in the summary. Priority needs go straight into the support plan.'],
+    ]),
+    gap(),
+    hint('Use referral information as a starting point, not a copy. A reviewer will look for the resident\'s own voice.'),
+    ...block('1. About this assessment', [fieldTable([
       'Resident name',
       'Date of birth',
       'Scheme and address',
@@ -175,42 +345,39 @@ function needsAssessment() {
       'Resident present and involved?',
       'Referred by',
       'Documents received from the referrer',
-    ]),
-    ...section('1. Housing history', [
+    ])]),
+    ...section('2. Housing history', [
       'Where have you lived over the last two years?',
       'Past tenancies, and how each one ended.',
       'Any rent arrears, evictions or housing register restrictions.',
       'What has helped you keep a home before?',
     ]),
-    ...section('2. Physical and mental health', [
+    ...section('3. Physical and mental health', [
       'Registered with a GP? Name of the practice.',
       'Current conditions, treatment and medication.',
       'Hospital stays in the last year.',
       'Mental health support in place, and who provides it.',
     ]),
-    ...section('3. Drug and alcohol use', ['Current use, if any.', 'Treatment or recovery support in place.', "The resident's own goals on drug or alcohol use."], 1300),
-    ...section('4. Money, debts and benefits', [
+    ...section('4. Drug and alcohol use', ['Current use, if any.', 'Treatment or recovery support in place.', "The resident's own goals on drug or alcohol use."], 1300),
+    ...section('5. Money, debts and benefits', [
       'Income and benefits, including the status of any Housing Benefit or Universal Credit claim.',
       'Debts, and who they are owed to.',
       'Bank account and ID.',
     ], 1300),
-    ...section('5. Risks', [
+    ...section('6. Risks', [
       'Risks to the resident, to others and from others.',
       'Offending history, licence conditions and probation contact, where relevant.',
       'Any safeguarding concerns, and who has been told.',
       'Risk information received before move-in, and anything still missing.',
     ]),
-    ...section('6. Relationships, family, education and work', ['Family, children and contact arrangements.', 'Friends and support networks.', 'Education, training, volunteering or work.'], 1300),
-    ...section("7. What the resident wants", ['Goals, in their own words.', 'What has helped before, and what has not.', 'Anything they do not want from support.']),
+    ...section('7. Relationships, family, education and work', ['Family, children and contact arrangements.', 'Friends and support networks.', 'Education, training, volunteering or work.'], 1300),
+    ...section('8. What the resident wants', ['Goals, in their own words.', 'What has helped before, and what has not.', 'Anything they do not want from support.']),
     new Paragraph({ children: [new PageBreak()] }),
-    h2('Summary of needs'),
-    hint('List each need found above. Priority needs go straight into the support plan.'),
-    gridTable(['Need', 'Priority (high, medium, low)', 'In the support plan?'], [5200, 2400, 2038], 8, 520),
-    h2('Consent to share information'),
-    p('The resident agrees that we can share relevant information with the following people or services. Write each one and tick to confirm.'),
-    gridTable(['Person or service', 'Reason', 'Agreed (tick)'], [4000, 4200, 1438], 5, 480),
-    h2('Sign-off'),
-    fieldTable(['Resident signature and date', 'Staff signature and date', 'Manager review: name, date and comments']),
+    h1('Summary and sign-off'),
+    ...block('9. Summary of needs', [hint('List each need found above. Priority needs go straight into the support plan.'), gap(), gridTable(['Need', 'Priority (high, medium, low)', 'In the support plan?'], [5200, 2400, 2038], 8, 520)]),
+    ...block('10. Consent to share information', [p('The resident agrees that we can share relevant information with the following people or services. Write each one and tick to confirm.'), gridTable(['Person or service', 'Reason', 'Agreed (tick)'], [4000, 4200, 1438], 5, 480)]),
+    ...block('11. Sign-off', [fieldTable(['Resident signature and date', 'Staff signature and date', 'Manager review: name, date and comments'])]),
+    ...cta(),
   ];
   return docShell('Needs assessment', [{ children }]);
 }
@@ -218,49 +385,50 @@ function needsAssessment() {
 // ---------------------------------------------------------------- Support plan
 
 function supportPlan() {
-  const goal = (n) => [
-    h2(`Goal ${n}`),
-    fieldTable(
-      [
-        "The goal, in the resident's own words",
-        'Why it matters to them',
-        'First steps (the next two weeks)',
-        'Support we will give: who, how often, where',
-        'How we will know it is working',
-        'Target date',
-      ],
-      PORTRAIT_W,
-      3600,
-    ),
+  sectionNo = 0;
+  const goalLabels = [
+    'The goal',
+    'Why it matters to them',
+    'First steps (the next two weeks)',
+    'Support we will give: who, how often, where',
+    'How we will know it is working',
+    'Target date',
   ];
   const portrait = [
-    h1('Support plan'),
-    p("Write goals in the resident's own words. Two to four goals is plenty. Small first steps get done, and getting them done builds trust for the harder goals."),
-    hint('Review the plan at least every three months, and sooner after any big change such as a hospital stay, an incident or a change in benefits.'),
-    h2('About this plan'),
-    fieldTable(['Resident name', 'Key worker', 'Plan start date', 'Based on the needs assessment dated', 'Next review date']),
-    ...goal(1),
-    ...goal(2),
-    ...goal(3),
-    ...goal(4),
-    h2('Managing risk'),
-    gridTable(['Risk', 'What we will do', 'Who', 'Review by'], [2900, 4100, 1400, 1238], 4, 600),
-    h2('Moving on'),
-    fieldTable(['Where the resident wants to live next', 'What could get in the way', 'Actions and who will do them', 'Housing register and move-on scheme status']),
-    h2('Sign-off'),
-    fieldTable(['I helped write this plan (resident signature and date)', 'Key worker signature and date']),
+    cover('Support plan', 'Goals that follow from assessed needs, written with the resident and reviewed as life changes.', ['2 to 4 goals', 'Review every 3 months', 'Session record included']),
     gap(),
+    steps([
+      ['Start from the assessment', 'Every goal should trace back to a need recorded in the needs assessment.'],
+      ['Keep goals small', "Write them in the resident's own words. Small first steps get done and build trust."],
+      ['Record and review', 'Log each session against a goal, and review the plan at least every three months.'],
+    ]),
+    gap(),
+    hint('Review sooner after any big change, such as a hospital stay, an incident or a change in benefits.'),
+    ...block('About this plan', [fieldTable(['Resident name', 'Key worker', 'Plan start date', 'Based on the needs assessment dated', 'Next review date'])]),
+    ...goalCard(1, goalLabels),
+    ...goalCard(2, goalLabels),
+    ...goalCard(3, goalLabels),
+    ...goalCard(4, goalLabels),
+    ...block('Managing risk', [gridTable(['Risk', 'What we will do', 'Who', 'Review by'], [2900, 4100, 1400, 1238], 4, 600)]),
+    ...block('Moving on', [fieldTable(['Where the resident wants to live next', 'What could get in the way', 'Actions and who will do them', 'Housing register and move-on scheme status'])]),
+    ...block('Sign-off', [fieldTable(['I helped write this plan (resident signature and date)', 'Key worker signature and date'])]),
+    new Paragraph({ children: [new PageBreak()] }),
     h1('Plan review log'),
-    p('Record each review here. Look at what has been achieved as well as what has not.'),
+    gap(),
+    hint('Record each review here. Look at what has been achieved as well as what has not.'),
+    gap(),
     gridTable(['Review date', 'What has been achieved', 'What has changed', 'Changes to the plan', 'Next review', 'Resident initials'], [1250, 2250, 1950, 1950, 1050, 1188], 8, 900),
+    ...cta(),
   ];
   const landscape = [
-    h1('Support session record'),
-    p('One row per session. Write it on the day, so someone who was not there can follow what happened and why.'),
+    h1('Support session record', LANDSCAPE_W),
+    gap(),
+    hint('One row per session. Write it on the day, so someone who was not there can follow what happened and why. Link every session to a plan goal.', LANDSCAPE_W),
+    gap(),
     gridTable(
       ['Date', 'Start', 'End', 'Who was there', 'What we did', 'Plan goal', 'Risks or concerns', 'Next actions', 'Initials'],
       [1250, 850, 850, 1850, 3500, 1200, 1950, 2070, 1050],
-      12,
+      10,
       620,
     ),
   ];
@@ -282,36 +450,84 @@ function styleHeader(row) {
   row.height = 32;
 }
 
+const navyFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF14304F' } };
+const solid = (argb) => ({ type: 'pattern', pattern: 'solid', fgColor: { argb } });
+
+/** Navy banner across the sheet, with a mint strapline underneath. */
 function titleBlock(ws, title, intro) {
-  ws.getCell('A1').value = title;
-  ws.getCell('A1').font = { bold: true, size: 16, color: { argb: 'FF14304F' } };
-  ws.getCell('A2').value = intro;
-  ws.getCell('A2').font = { italic: true, color: { argb: 'FF5B6B80' } };
-  ws.getCell('A2').alignment = { wrapText: false };
+  const cols = Math.max(ws.columns ? ws.columns.length : 1, 1);
+  const last = String.fromCharCode(64 + cols);
+  ws.views = [{ ...(ws.views && ws.views[0] ? ws.views[0] : {}), showGridLines: false }];
+  ws.mergeCells(`A1:${last}1`);
+  ws.mergeCells(`A2:${last}2`);
+  const t = ws.getCell('A1');
+  t.value = { richText: [{ text: 'EXEMPTACCOMMODATION.COM   ', font: { bold: true, size: 9, color: { argb: 'FF8FE3DC' } } }, { text: title, font: { bold: true, size: 18, color: { argb: 'FFFFFFFF' } } }] };
+  t.fill = navyFill;
+  t.alignment = { vertical: 'middle', indent: 1 };
+  ws.getRow(1).height = 42;
+  const i = ws.getCell('A2');
+  i.value = intro;
+  i.font = { italic: true, color: { argb: 'FF0E7A76' } };
+  i.fill = solid('FFE7F6F4');
+  i.alignment = { vertical: 'middle', indent: 1 };
+  ws.getRow(2).height = 24;
 }
 
 function guideSheet(wb, title, lines) {
   const ws = wb.addWorksheet('How to use', { properties: { tabColor: { argb: 'FF129994' } } });
-  ws.getColumn(1).width = 110;
-  ws.getCell('A1').value = title;
-  ws.getCell('A1').font = { bold: true, size: 16, color: { argb: 'FF14304F' } };
+  ws.columns = [{ width: 7 }, { width: 104 }];
+  titleBlock(ws, title, 'Free template. Work through the steps below, then use the other tabs.');
   lines.forEach((l, i) => {
-    const c = ws.getCell(`A${i + 3}`);
-    c.value = l;
-    c.alignment = { wrapText: true, vertical: 'top' };
+    const r = ws.getRow(i + 4);
+    const m = /^(\d+)\.\s+(.*)$/.exec(l);
+    const n = r.getCell(1);
+    n.value = m ? m[1].padStart(2, '0') : 'i';
+    n.font = { bold: true, size: 13, color: { argb: 'FFFFFFFF' } };
+    n.fill = solid(m ? 'FF129994' : 'FF14304F');
+    n.alignment = { horizontal: 'center', vertical: 'middle' };
+    const c = r.getCell(2);
+    c.value = m ? m[2] : l;
+    c.fill = solid(i % 2 ? 'FFFFFFFF' : 'FFF4F7FA');
+    c.alignment = { wrapText: true, vertical: 'middle', indent: 1 };
+    c.border = { bottom: { style: 'thin', color: { argb: 'FFE1E6EC' } } };
+    r.height = Math.max(30, Math.ceil(c.value.length / 95) * 16 + 12);
   });
-  const last = ws.getCell(`A${lines.length + 5}`);
+  const ctaRow = lines.length + 6;
+  ws.mergeCells(`A${ctaRow}:B${ctaRow}`);
+  ws.mergeCells(`A${ctaRow + 1}:B${ctaRow + 1}`);
+  const c1 = ws.getCell(`A${ctaRow}`);
+  c1.value = { richText: [{ text: 'SUPPORT AUDIT   ', font: { bold: true, size: 9, color: { argb: 'FF8FE3DC' } } }, { text: 'Would your files stand up to a licensing check?', font: { bold: true, size: 14, color: { argb: 'FFFFFFFF' } } }] };
+  c1.fill = navyFill;
+  c1.alignment = { vertical: 'middle', indent: 1 };
+  ws.getRow(ctaRow).height = 34;
+  const c2 = ws.getCell(`A${ctaRow + 1}`);
+  c2.value = 'Independent resident file audits, rated Gold, Green, Amber or Red. Book a free discovery call at supportaudit.co.uk/book-a-call';
+  c2.font = { color: { argb: 'FFDCE6F0' } };
+  c2.fill = navyFill;
+  c2.alignment = { vertical: 'middle', indent: 1, wrapText: true };
+  ws.getRow(ctaRow + 1).height = 30;
+  const last = ws.getCell(`B${ctaRow + 3}`);
   last.value = `Free template from ${SITE}. Guidance covers England and is general information, not legal advice.`;
-  last.font = { italic: true, color: { argb: 'FF5B6B80' } };
+  last.font = { italic: true, size: 9, color: { argb: 'FF5B6B80' } };
   return ws;
+}
+
+/** Light zebra banding on data rows. */
+function band(ws, from, to, cols) {
+  for (let r = from; r <= to; r++) if ((r - from) % 2) for (let c = 1; c <= cols; c++) { const cell = ws.getRow(r).getCell(c); if (!cell.fill || cell.fill.type !== 'pattern') cell.fill = solid('FFF4F7FA'); }
 }
 
 function printSetup(wb) {
   wb.eachSheet((ws) => {
+    // One typeface everywhere, including cells that only have a colour or bold set.
+    ws.eachRow({ includeEmpty: true }, (row) => row.eachCell({ includeEmpty: true }, (c) => {
+      if (c.value && typeof c.value === 'object' && c.value.richText) c.value = { richText: c.value.richText.map((t) => ({ ...t, font: { name: 'Arial', ...(t.font || {}) } })) };
+      c.font = { name: 'Arial', size: 10, ...(c.font || {}) };
+    }));
     ws.pageSetup = { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.5, right: 0.5, top: 0.6, bottom: 0.6, header: 0.3, footer: 0.3 } };
     ws.headerFooter = { oddFooter: `&L&8Free template from ${SITE}&R&8Page &P of &N` };
     ws.eachRow((row, n) => {
-      if (n <= 2 && ws.name !== 'How to use') return; // titles stay on one line
+      if (n <= 2 || ws.name === 'How to use') return; // banners and the guide keep their own layout
       row.eachCell((c) => (c.alignment = { ...(c.alignment || {}), vertical: 'top', wrapText: true }));
     });
   });
@@ -348,6 +564,9 @@ async function rentSchedule() {
     r.getCell(1).font = { bold: true };
     r.getCell(2).value = v;
     r.getCell(2).border = boxed;
+    r.getCell(2).fill = solid('FFFFFBEA');
+    r.getCell(1).fill = solid('FFE7F6F4');
+    r.getCell(1).font = { bold: true, color: { argb: 'FF14304F' } };
   });
   const beds = '$B$6';
   const head = ws.getRow(9);
@@ -387,6 +606,16 @@ async function rentSchedule() {
     r.getCell(2).dataValidation = { type: 'list', allowBlank: true, formulae: ['"Eligible,Ineligible,Depends"'] };
   });
   const lastRow = first + lines.length - 1;
+  band(ws, first, lastRow, 6);
+  ws.addConditionalFormatting({
+    ref: `B${first}:B${lastRow}`,
+    rules: [
+      { type: 'cellIs', operator: 'equal', formulae: ['"Eligible"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFD7F2E6' } }, font: { bold: true, color: { argb: 'FF1E7A4F' } } }, priority: 1 },
+      { type: 'cellIs', operator: 'equal', formulae: ['"Depends"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFBF0D9' } }, font: { bold: true, color: { argb: 'FF9A6A12' } } }, priority: 2 },
+      { type: 'cellIs', operator: 'equal', formulae: ['"Ineligible"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFDE1DB' } }, font: { bold: true, color: { argb: 'FFB0402B' } } }, priority: 3 },
+    ],
+  });
+  for (let i = first; i <= lastRow; i++) ws.getRow(i).getCell(4).fill = solid('FFFFFBEA');
   const sumRow = lastRow + 2;
   const totals = [
     ['Total eligible', 'Eligible'],
@@ -401,13 +630,16 @@ async function rentSchedule() {
     r.getCell(5).value = { formula: `IF(${beds}=0,"",D${sumRow + i}/52/${beds})` };
     r.getCell(4).numFmt = '£#,##0.00';
     r.getCell(5).numFmt = '£#,##0.00';
+    for (let c = 3; c <= 5; c++) { r.getCell(c).fill = solid('FFE7F6F4'); r.getCell(c).border = boxed; }
   });
   const grand = ws.getRow(sumRow + 3);
+  for (let c = 3; c <= 5; c++) { grand.getCell(c).fill = navyFill; grand.getCell(c).border = boxed; }
+  grand.height = 26;
   grand.getCell(3).value = 'Total weekly charge per resident';
-  grand.getCell(3).font = { bold: true, color: { argb: 'FF0E7A76' } };
+  grand.getCell(3).font = { bold: true, color: { argb: 'FFFFFFFF' } };
   grand.getCell(5).value = { formula: `IF(${beds}=0,"",SUM($D$${first}:$D$${lastRow})/52/${beds})` };
   grand.getCell(5).numFmt = '£#,##0.00';
-  grand.getCell(5).font = { bold: true, color: { argb: 'FF0E7A76' } };
+  grand.getCell(5).font = { bold: true, size: 13, color: { argb: 'FF8FE3DC' } };
 
   const rec = wb.addWorksheet('Reconciliation');
   rec.columns = [{ width: 44 }, { width: 18 }, { width: 18 }, { width: 16 }, { width: 50 }];
@@ -483,6 +715,14 @@ async function readinessChecklist() {
   let row = 5;
   const areaRows = {};
   for (const a of [...areas, extra]) {
+    ws.mergeCells(`A${row}:H${row}`);
+    const band = ws.getCell(`A${row}`);
+    band.value = a.title.toUpperCase();
+    band.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    band.fill = solid('FF129994');
+    band.alignment = { vertical: 'middle', indent: 1 };
+    ws.getRow(row).height = 22;
+    row++;
     const start = row;
     for (const q of a.questions) {
       const r = ws.getRow(row);
@@ -492,6 +732,10 @@ async function readinessChecklist() {
       r.getCell(4).dataValidation = { type: 'list', allowBlank: true, formulae: ['"Yes,Partly,No,Not sure"'] };
       r.getCell(7).numFmt = 'dd/mm/yyyy';
       for (let c = 1; c <= 8; c++) r.getCell(c).border = boxed;
+      if ((row - start) % 2) for (const c of [1, 2, 3]) r.getCell(c).fill = solid('FFF4F7FA');
+      r.getCell(1).font = { color: { argb: 'FF5B6B80' }, size: 9 };
+      r.getCell(2).font = { bold: true, color: { argb: 'FF129994' } };
+      r.getCell(4).fill = solid('FFFFFBEA');
       r.height = 34;
       row++;
     }
@@ -530,9 +774,22 @@ async function readinessChecklist() {
     for (let c = 1; c <= 7; c++) r.getCell(c).border = boxed;
     srow++;
   }
+  sum.addConditionalFormatting({
+    ref: `G5:G${srow + 1}`,
+    rules: [
+      { type: 'dataBar', priority: 1, minLength: 0, maxLength: 100, cfvo: [{ type: 'num', value: 0 }, { type: 'num', value: 100 }], color: { argb: 'FF129994' }, gradient: false },
+      { type: 'cellIs', operator: 'greaterThanOrEqual', formulae: ['75'], style: { font: { bold: true, color: { argb: 'FF1E7A4F' } } }, priority: 2 },
+      { type: 'cellIs', operator: 'between', formulae: ['50', '74'], style: { font: { bold: true, color: { argb: 'FF9A6A12' } } }, priority: 3 },
+      { type: 'cellIs', operator: 'lessThan', formulae: ['50'], style: { font: { bold: true, color: { argb: 'FFB0402B' } } }, priority: 4 },
+    ],
+  });
+  band(sum, 5, srow - 1, 7);
   const o = sum.getRow(srow + 1);
   o.values = ['Overall', { formula: `SUM(B5:B${srow - 1})` }, { formula: `SUM(C5:C${srow - 1})` }, { formula: `SUM(D5:D${srow - 1})` }, { formula: `SUM(E5:E${srow - 1})` }, { formula: `SUM(F5:F${srow - 1})` }, { formula: `ROUND((2*B${srow + 1}+C${srow + 1})/(2*F${srow + 1})*100,0)` }];
-  o.font = { bold: true, color: { argb: 'FF0E7A76' } };
+  o.eachCell((c) => { c.fill = navyFill; c.font = { bold: true, color: { argb: 'FFFFFFFF' } }; c.border = boxed; });
+  o.height = 26;
+  sum.getCell(`A${srow + 3}`).value = 'Green 75 and over: ready to evidence.   Amber 50 to 74: gaps to close.   Red under 50: act now.';
+  sum.getCell(`A${srow + 3}`).font = { italic: true, size: 9, color: { argb: 'FF5B6B80' } };
   printSetup(wb);
   return wb.xlsx.writeBuffer();
 }

@@ -35,7 +35,7 @@ export const templates: Template[] = [
       "Free Word support plan template for supported housing, with goals in the resident's words, risk, move-on, a review log and a session record.",
     file: '/downloads/support-plan-template.docx',
     format: 'Word',
-    pages: '4 pages',
+    pages: '5 pages',
     quickAnswer:
       "A free support plan template in Word, built around what councils and the planned licensing conditions look for. Up to four goals in the resident's own words, first steps, who gives what support and when, risks, a move-on plan, a review log and a session record sheet.",
     inside: [
@@ -82,7 +82,7 @@ export const templates: Template[] = [
       'Free Word needs assessment template for supported housing residents, covering history, health, money, risk and goals, ready for the four-week deadline.',
     file: '/downloads/needs-assessment-template.docx',
     format: 'Word',
-    pages: '4 pages',
+    pages: '6 pages',
     quickAnswer:
       "A free needs assessment template in Word for new residents in supported housing. It covers housing history, health, drug and alcohol use, money, risks, relationships and the resident's own goals, with a summary of needs, consent to share information and sign-off.",
     inside: [

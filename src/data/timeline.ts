@@ -139,7 +139,7 @@ export const timeline: Milestone[] = [
     date: '16 April 2026',
     iso: '2026-04-16',
     title: 'Government response on licensing',
-    text: 'Licensing will mirror the Act\'s definition of supported exempt accommodation, with no licence per scheme, a wider fit and proper test and needs assessments within four weeks. Updated 19 June 2026.',
+    text: 'Licensing will mirror the Act\'s definition of supported exempt accommodation, with no licence per scheme, a wider fit and proper test and needs assessments within four weeks. Updated 16 October 2026.',
     status: 'done',
     tag: 'Regulation',
     link: { label: 'What was decided', href: '/guides/supported-housing-regulatory-oversight-act/' },
